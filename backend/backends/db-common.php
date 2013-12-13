@@ -79,7 +79,6 @@ function resultsToArray(& $results, $type = false) {
 				$me->playcount = $results->data[$i]['playcount'];
 				$me->dlcount = $results->data[$i]['dlcount'];
 				$me->longdesc = jz_db_unescape($results->data[$i]['longdesc']);
-				$me->ptype = jz_db_unescape($results->data[$i]['ptype']);
 				// Gross hack to follow;
 				// Fixes case where an album is in 2 genres from 1 artist:
 				if ($backend == "id3-database") {
@@ -91,31 +90,7 @@ function resultsToArray(& $results, $type = false) {
 					$arr[] = $me;
 				}
 			} else {
-			  $r = $results->data[$i];
-			  $track = & new jzMediaTrack(jz_db_unescape($r['path']));
-			  
-			  // we never query for just bitrate, so if it's returned, we have all meta.
-			  if (isset($r['bitrate']) && $r['bitrate'] != '-') {
-			    $meta = array();
-			    $meta['title'] = jz_db_unescape($r['trackname']);
-			    $meta['bitrate'] = jz_db_unescape($r['bitrate']);
-			    $meta['frequency'] = jz_db_unescape($r['frequency']);
-			    $meta['filename'] = jz_db_unescape($r['name']);
-			    $meta['size'] = jz_db_unescape($r['filesize']);
-			    $meta['year'] = jz_db_unescape($r['year']);
-			    if (isset($r['descr'])) {
-			      $meta['comment'] = jz_db_unescape($r['descr']);
-			    }
-			    $meta['length'] = jz_db_unescape($r['length']);
-			    $meta['number'] = jz_db_unescape($r['number']);
-			    $meta['genre'] = jz_db_unescape($r['genre']);
-			    $meta['artist'] = jz_db_unescape($r['artist']);
-			    $meta['album'] = jz_db_unescape($r['album']);
-			    $meta['lyrics'] = jz_db_unescape($r['lyrics']);
-			    $meta['type'] = jz_db_unescape($r['extension']);
-			    $track->meta = $meta;
-			  }
-			  $arr[] = $track;
+				$arr[] = & new jzMediaTrack(jz_db_unescape($results->data[$i]['path']));
 			}
 		}
 		return $arr;

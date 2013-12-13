@@ -1,5 +1,5 @@
 <?php if (!defined(JZ_SECURE_ACCESS)) die('Security breach detected.');
-global $include_path, $jzUSER, $jzSERVICES, $cms_mode, $enable_audioscrobbler, $as_override_user, $as_override_all, $http_auth_enable, $allow_lang_choice, $allow_interface_choice, $allow_style_choice, $allow_player_choice;
+global $include_path, $jzUSER, $jzSERVICES, $cms_mode, $enable_audioscrobbler, $as_override_user, $as_override_all;
 
 $this->displayPageTop("", word("User Preferences"));
 $this->openBlock();
@@ -15,19 +15,10 @@ if (isset ($_POST['update_settings'])) {
 	$arr = array ();
 	$arr['email'] = $_POST['email'];
 	$arr['fullname'] = $_POST['fullname'];
-	if ($allow_interface_choice == "true") {
-	  $arr['frontend'] = $_POST['def_interface'];
-	}
-	if ($allow_style_choice == "true") {
-	  $arr['theme'] = $_POST['def_theme'];
-	}
-	if ($allow_lang_choice == "true") {
-	  $arr['language'] = $_POST['def_language'];
-	}
+	$arr['frontend'] = $_POST['def_interface'];
+	$arr['theme'] = $_POST['def_theme'];
+	$arr['language'] = $_POST['def_language'];
 	$arr['playlist_type'] = $_POST['pltype'];
-	if ($allow_player_choice == "true") {
-	  $arr['player'] = $_POST['def_player'];
-	}
 	$arr['asuser'] = $_POST['asuser'];
 	$arr['aspass'] = $_POST['aspass'];
 	$jzUSER->setSettings($arr);
@@ -48,18 +39,9 @@ if (isset ($_POST['update_settings'])) {
 			</SCRIPT>
 		<?php
 
-	echo word("Preferences saved");
 
 	//$this->closeWindow(true);
 	//return;
-}
-
-if (isset($http_auth_enable) && $http_auth_enable == "true") {
-  $edit_pwd = false;  
-} else if ($cms_mode == "false") {
-  $edit_pwd = true;
-} else {
-  $edit_pwd = false;
 }
 
 $url_array = array ();
@@ -68,7 +50,7 @@ $url_array['ptype'] = "preferences";
 echo '<form action="' . urlize($url_array) . '" method="POST">';
 ?>
 	<table width="100%" cellpadding="3">
-<?php	if ($edit_pwd == true) { ?>
+<?php	if ($cms_mode == "false") { ?>
 		<tr>
 			<td width="30%" valign="top" align="right">
 				<?php echo word("Password"); ?>:
@@ -77,9 +59,7 @@ echo '<form action="' . urlize($url_array) . '" method="POST">';
 				<input type="password" name="field1" class="jz_input" value="jznoupd"><br>
 				<input type="password" name="field2" class="jz_input" value="jznoupd">
 			</td>
-		</tr><?php } else { ?>
-				<input type="hidden" name="field1" value="jznoupd">
-				<input type="hidden" name="field2" value="jznoupd"> <?php } ?>
+		</tr><?php } else { ?> <input type="hidden" name="field1" value="jznoupd"> <?php } ?>
 		<tr>
 			<td width="30%" valign="top" align="right">
 				<?php echo word("Full Name"); ?>:
@@ -122,7 +102,6 @@ if ($enable_audioscrobbler == "true" and ($as_override_user == "" or $as_overrid
 				<?php
 
 }
-if ($allow_interface_choice == "true") {
 ?>
 		
 		
@@ -148,10 +127,6 @@ for ($i = 0; $i < count($retArray); $i++) {
 				</select>
 			</td>
 		</tr>
-<?php
-}
-if ($allow_style_choice == "true") {
-?>
 		<tr>
 			<td width="30%" valign="top" align="right">
 				<?php echo word("Theme"); ?>:
@@ -177,10 +152,6 @@ for ($i = 0; $i < count($retArray); $i++) {
 				</select>
 			</td>
 		</tr>
-<?php
-}
-if ($allow_lang_choice == "true") {
-?>
 		<tr>
 			<td width="30%" valign="top" align="right">
 				<?php echo word("Language"); ?>:
@@ -202,39 +173,6 @@ for ($i = 0; $i < count($languages); $i++) {
 				</select>
 			</td>
 		</tr>
-<?php
-}
-if ($allow_player_choice == "true") {
-?>
-		<tr>
-			<td width="30%" valign="top" align="right">
-				<?php echo word("External Player"); ?>:
-			</td>
-			<td width="70%">
-				<select name="def_player" class="jz_select" style="width:135px;">
-				<option value=""> - </option>
-<?php
-
-// Let's get all the players
-$retArray = readDirInfo($include_path . "services/services/players", "file");
-sort($retArray);
-for ($i = 0; $i < count($retArray); $i++) {
-  if (stripos(strrev($retArray[$i]),"php.") !== 0) {continue;}
-  $val = substr($retArray[$i],0,-4);
-  if ($val == "qt") {continue;}
-  echo '<option ';
-  if ($val == $jzUSER->getSetting('player')) {
-    echo 'selected ';
-  }
-  echo 'value="' . $val . '">' . $val . "</option>\n";
-}
-?>
-				</select>
-			</td>
-		</tr>
-<?php
-}
-?>
 				    <tr>
 			<td width="30%" valign="top" align="right">
 				<?php echo word("Playlist Type"); ?>:

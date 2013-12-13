@@ -82,28 +82,26 @@ class getID3_cached_mysql extends getID3
 
 		// Check for mysql support
 		if (!function_exists('mysql_pconnect')) {
-			throw new Exception('PHP not compiled with mysql support.');
+			die('PHP not compiled with mysql support.');
 		}
 
 		// Connect to database
 		$this->connection = mysql_pconnect($host, $username, $password);
 		if (!$this->connection) {
-			throw new Exception('mysql_pconnect() failed - check permissions and spelling.');
+			die('mysql_pconnect() failed - check permissions and spelling.');
 		}
 
 		// Select database
 		if (!mysql_select_db($database, $this->connection)) {
-			throw new Exception('Cannot use database '.$database);
+			die('Cannot use database '.$database);
 		}
 
 		// Create cache table if not exists
 		$this->create_table();
 
 		// Check version number and clear cache if changed
-		$version = '';
-		if ($this->cursor = mysql_query("SELECT `value` FROM `getid3_cache` WHERE (`filename` = '".mysql_real_escape_string(GETID3_VERSION)."') AND (`filesize` = '-1') AND (`filetime` = '-1') AND (`analyzetime` = '-1')", $this->connection)) {
-			list($version) = mysql_fetch_array($this->cursor);
-		}
+		$this->cursor = mysql_query("SELECT `value` FROM `getid3_cache` WHERE (`filename` = '".GETID3_VERSION."') AND (`filesize` = '-1') AND (`filetime` = '-1') AND (`analyzetime` = '-1')", $this->connection);
+		list($version) = @mysql_fetch_array($this->cursor);
 		if ($version != GETID3_VERSION) {
 			$this->clear_cache();
 		}
@@ -130,22 +128,25 @@ class getID3_cached_mysql extends getID3
 			// Short-hands
 			$filetime = filemtime($filename);
 			$filesize = filesize($filename);
+			$filenam2 = mysql_escape_string($filename);
 
 			// Loopup file
-			$result = '';
-			if ($this->cursor = mysql_query("SELECT `value` FROM `getid3_cache` WHERE (`filename` = '".mysql_real_escape_string($filename)."') AND (`filesize` = '".mysql_real_escape_string($filesize)."') AND (`filetime` = '".mysql_real_escape_string($filetime)."')", $this->connection)) {
-				// Hit
-				list($result) = mysql_fetch_array($this->cursor);
-				return unserialize(base64_decode($result));
+			$this->cursor = mysql_query("SELECT `value` FROM `getid3_cache` WHERE (`filename`='".$filenam2."') AND (`filesize`='".$filesize."') AND (`filetime`='".$filetime."')", $this->connection);
+			list($result) = @mysql_fetch_array($this->cursor);
+
+			// Hit
+			if ($result) {
+				return unserialize($result);
 			}
 		}
 
 		// Miss
-		$analysis = parent::analyze($filename);
+		$result = parent::analyze($filename);
 
 		// Save result
 		if (file_exists($filename)) {
-			$this->cursor = mysql_query("INSERT INTO `getid3_cache` (`filename`, `filesize`, `filetime`, `analyzetime`, `value`) VALUES ('".mysql_real_escape_string($filename)."', '".mysql_real_escape_string($filesize)."', '".mysql_real_escape_string($filetime)."', '".mysql_real_escape_string(time())."', '".mysql_real_escape_string(base64_encode(serialize($analysis)))."')", $this->connection);
+			$res2 = mysql_escape_string(serialize($result));
+			$this->cursor = mysql_query("INSERT INTO `getid3_cache` (`filename`, `filesize`, `filetime`, `analyzetime`, `value`) VALUES ('".$filenam2."', '".$filesize."', '".$filetime."', '".time()."', '".$res2."')", $this->connection);
 		}
 		return $result;
 	}
@@ -153,7 +154,7 @@ class getID3_cached_mysql extends getID3
 
 
 	// private: (re)create sql table
-	function create_table($drop=false) {
+	function create_table($drop = false) {
 
 		$this->cursor = mysql_query("CREATE TABLE IF NOT EXISTS `getid3_cache` (
 			`filename` VARCHAR(255) NOT NULL DEFAULT '',

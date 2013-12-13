@@ -1,4 +1,4 @@
-<?php
+<?php 
 	define('JZ_SECURE_ACCESS','true');
 	/**
 	* - JINZORA | Web-based Media Streamer -  
@@ -58,13 +58,10 @@
 	$this_page = setThisPage();
         $enable_page_caching = "false";
 
-	url_alias();
-	// see this method for persistent vars
-	$api_page = get_base_url();
+url_alias();
+// see this method for persistent vars
+$api_page = get_base_url();
 	
-	// Clean up input variables
-	$_REQUEST = unurlize($_REQUEST);
-
 	// Let's create our user object for later
 	$jzUSER = new jzUser();
 	
@@ -456,25 +453,18 @@ function setpassword() {
 		    $ntype = 'tracks';
 		  }
 		}
-
-		if (isset($_REQUEST['offset']) || isset($_REQUEST['limit'])){
-			//$results = array_slice($results,$_REQUEST['offset'],$_REQUEST['limit']);
+		$results = $root->getSubNodes($ntype,$distance);
+		if (isset($_REQUEST['offset']) || isset($REQUEST['length'])){
+			$results = array_slice($results,$_REQUEST['offset'],$_REQUEST['length']);
 		}
-
-		$lim = isset($_REQUEST['limit']) ? $_REQUEST['limit'] : 0;
-		$off = isset($_REQUEST['offset']) ? $_REQUEST['offset'] : false;
-		$results = $root->getSubNodes($ntype,$distance,false,$lim,false,$off);
-
-		$total = $root->getSubNodeCount($ntype,$distance);
-		$meta = array('totalMatches' => $total);
-		print_results($results, $type, $trackfields, $nodefields, $meta);
+		print_results($results,$type, $trackfields, $nodefields);
 	}
-
+	
 	function getTrackArt(){
 		$display = new jzDisplay();
 		$track = &new jzMediaTrack($_GET['jz_path'],"id");
 		$album = $track->getAncestor("album");
-		$art = $album->getMainArt(false, true, "audio", true);
+		$art = $album->getMainArt();
 		
 		if($_GET['type'] == 'xml'){
 			echoXMLHeader();
@@ -486,7 +476,7 @@ function setpassword() {
 			}
 			echo "        </image>\n"; 
 			echo "        <thumbnail>";
-			$art = $album->getMainArt('75x75', true, "audio", true);
+			$art = $album->getMainArt('75x75');
 			if ($art){
 				echo xmlentities($display->returnImage($art,false,75,75, "limit", false, false, false, false, false, "0", false, true, true));
 			}
@@ -505,9 +495,9 @@ function setpassword() {
 		$track = &new jzMediaTrack($_GET['jz_path'],"id");
 					
 		$meta = $track->getMeta();
-
+					
 		$album = $track->getAncestor("album");
-		$art = $album->getMainArt(false, true, "audio", true);
+		$art = $album->getMainArt();
 		$artist = $album->getAncestor("artist");
 		$genre = $artist->getParent();
 		$results = array();
@@ -906,11 +896,11 @@ function userHistories() {
 							echo "    <title>". $this_site. xmlUrlClean($meta['title']). "</title>\n";
 							echo "    <album>\n";
 							echo "      <name>". $this_site. xmlUrlClean($album->getName()). "</name>\n";
-							echo "      <image>". $this_site. xmlUrlClean($display->returnImage($album->getMainArt(false, true, "audio", true),$album->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true)). "</image>\n";
+							echo "      <image>". $this_site. xmlUrlClean($display->returnImage($album->getMainArt(),$album->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true)). "</image>\n";
 							echo "    </album>\n";					
 							echo "    <artist>\n";
 							echo "      <name>". $this_site. xmlUrlClean($artist->getName()). "</name>\n";
-							echo "      <image>". $this_site. xmlUrlClean($display->returnImage($artist->getMainArt(false, true, "audio", true),$artist->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true)). "</image>\n";
+							echo "      <image>". $this_site. xmlUrlClean($display->returnImage($artist->getMainArt(),$artist->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true)). "</image>\n";
 							echo "    </artist>\n";
 							echo "  </item>\n";
 						break;
@@ -922,12 +912,12 @@ function userHistories() {
 							}
 							echo $meta['title']. "<br>";
 							echo $album->getName(). "<br>";
-							echo $this_site. $display->returnImage($album->getMainArt(false, true, "audio", true),$album->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true). "<br>";
+							echo $this_site. $display->returnImage($album->getMainArt(),$album->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true). "<br>";
 							echo $artist->getName(). "<br>";
-							echo $display->returnImage($artist->getMainArt(false, true, "audio", true),$artist->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true). "<br>";
+							echo $display->returnImage($artist->getMainArt(),$artist->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true). "<br>";
 						break;
 						case "mt":
-							$art = $album->getMainArt($imagesize, true, "audio", true);
+							$art = $album->getMainArt($imagesize);
 							if ($art){					
 								// Now let's try to get the link from the amazon meta data service
 								if ($_REQUEST['amazon_id'] <> ""){
@@ -980,11 +970,11 @@ function userHistories() {
 					echo "    <title>". $this_site. xmlUrlClean($meta['title']). "</title>\n";
 					echo "    <album>\n";
 					echo "      <name>". $this_site. xmlUrlClean($album->getName()). "</name>\n";
-					echo "      <image>". $this_site. xmlUrlClean($display->returnImage($album->getMainArt(false, true, "audio", true),$album->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true)). "</image>\n";
+					echo "      <image>". $this_site. xmlUrlClean($display->returnImage($album->getMainArt(),$album->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true)). "</image>\n";
 					echo "    </album>\n";					
 					echo "    <artist>\n";
 					echo "      <name>". $this_site. xmlUrlClean($artist->getName()). "</name>\n";
-					echo "      <image>". $this_site. xmlUrlClean($display->returnImage($artist->getMainArt(false, true, "audio", true),$artist->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true)). "</image>\n";
+					echo "      <image>". $this_site. xmlUrlClean($display->returnImage($artist->getMainArt(),$artist->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true)). "</image>\n";
 					echo "    </artist>\n";
 					echo "  </item>\n";
 				break;
@@ -996,9 +986,9 @@ function userHistories() {
 					}
 					echo $meta['title']. "<br>";
 					echo $album->getName(). "<br>";
-					echo $this_site. $display->returnImage($album->getMainArt(false, true, "audio", true),$album->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true). "<br>";
+					echo $this_site. $display->returnImage($album->getMainArt(),$album->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true). "<br>";
 					echo $artist->getName(). "<br>";
-					echo $display->returnImage($artist->getMainArt(false, true, "audio", true),$artist->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true). "<br>";
+					echo $display->returnImage($artist->getMainArt(),$artist->getName(),false, false, "limit", false, false, false, false, false, "0", false, true, true). "<br>";
 				break;
 				case "mt":
 					if (isset($_REQUEST['align'])){
@@ -1006,7 +996,7 @@ function userHistories() {
 							echo "<center>";
 						}
 					}
-					$art = $album->getMainArt($imagesize, true, "audio", true);
+					$art = $album->getMainArt($imagesize);
 					if ($art){					
 						// Now let's try to get the link from the amazon meta data service
 						if ($_REQUEST['amazon_id'] <> ""){
@@ -1167,7 +1157,7 @@ function userHistories() {
 			echo '    <link>'. $this_site. xmlUrlClean($display->link($item,false,false,false,true,true)). '</link>'. "\n";
 			// Now did they want full details?
 			if (isset($_REQUEST['full']) && $_REQUEST['full'] == "true"){
-				if (($art = $item->getMainArt(false, true, "audio", true)) !== false){
+				if (($art = $item->getMainArt()) !== false){
 					$image = xmlUrlClean($display->returnImage($art,false,false,false,"limit",false,false,false,false,false,"0",false,true));
 				} else {
 					$image = "";
@@ -1221,7 +1211,7 @@ function print_lists($results, $format='xml') {
  * Results is an array of nodes and tracks.
  * Prints results in a variety of formats.
  */
-function print_results($results, $format='xml', $trackfields=false, $nodefields=false, $queryMeta=false) {
+function print_results($results, $format='xml', $trackfields=false, $nodefields=false) {
   global $this_site,$api_page; 
   $display = new jzDisplay();
 		$tracks = array();
@@ -1259,13 +1249,12 @@ function print_results($results, $format='xml', $trackfields=false, $nodefields=
 					// albums where their parent would be DISC1 not AlbumName
 					// You can do this recursively if you want
 					$album = $track->getAncestor("album");
-					$art = $album->getMainArt(false, true, "audio", true);
+					$art = $album->getMainArt();
 					$artist = $album->getAncestor("artist");
 					$genre = $artist->getParent();
 					
 					// Now let's display
 					echo "      <track>\n";
-					if(!is_array($trackfields) || in_array('id', $trackfields)) echo "        <id>". xmlentities($track->getID()). "</id>\n";
 					if(!is_array($trackfields) || in_array('name', $trackfields)) echo "        <name>". xmlentities($meta['title']). "</name>\n";
 					if(!is_array($trackfields) || in_array('metadata', $trackfields)){
 						echo "        <metadata>\n";
@@ -1291,7 +1280,7 @@ function print_results($results, $format='xml', $trackfields=false, $nodefields=
 					}
 					if(!is_array($trackfields) || in_array('thumbnail', $trackfields)){
 						echo "        <thumbnail>";
-						$art = $album->getMainArt('75x75', true, "audio", true);
+						$art = $album->getMainArt('75x75');
 						if ($art){
 							echo xmlentities($display->returnImage($art,false,75,75, "limit", false, false, false, false, false, "0", false, true, true));
 						}
@@ -1309,7 +1298,7 @@ function print_results($results, $format='xml', $trackfields=false, $nodefields=
 					// $art would be the image for the item we're looking at
 					// In this case we want the art for the match we found
 					// This works on ALL objects if they have art
-					$art = $node->getMainArt(false, true, "audio", true);
+					$art = $node->getMainArt();
 					
 					$album = $node->getAncestor("album");
 					if ($album) {
@@ -1319,7 +1308,6 @@ function print_results($results, $format='xml', $trackfields=false, $nodefields=
                                         }
 					
 					echo "      <node>\n";
-					if(!is_array($nodefields) || in_array('id', $nodefields)) echo "        <id>". xmlentities($node->getID()). "</id>\n";
 					if(!is_array($nodefields) || in_array('name', $nodefields)) echo "        <name>". xmlentities($node->getName()). "</name>\n";
 					if(!is_array($nodefields) || in_array('type', $nodefields)) echo "        <type>". xmlentities(ucwords($node->getPType())). "</type>\n";
 					if(!is_array($nodefields) || in_array('link', $nodefields)) echo "        <link>". xmlentities($this_site.$display->link($node,false,false,false,true,true)). "</link>\n";
@@ -1338,7 +1326,7 @@ function print_results($results, $format='xml', $trackfields=false, $nodefields=
 					}
 					if(!is_array($nodefields) || in_array('thumbnail', $nodefields)) {
 						echo "        <thumbnail>";
-						$art = $node->getMainArt('75x75', true, "audio", true);
+						$art = $node->getMainArt('75x75');
 						if ($art){
 							echo xmlentities($display->returnImage($art,false,75,75, "limit", false, false, false, false, false, "0", false, true, true));
 						}
@@ -1376,13 +1364,12 @@ function print_results($results, $format='xml', $trackfields=false, $nodefields=
 		    if ($album) $artist = $album->getAncestor("artist");
 		    if ($artist) $genre = $artist->getParent();
 		    
-		    if ($album) $art = $album->getMainArt(false, true, "audio", true);
+		    if ($album) $art = $album->getMainArt();
 		    
 		    // Now let's display
 		    if(!is_array($trackfields) || in_array('image', $trackfields)) $n['image']=($art) ? $display->returnImage($art,false,false, false, "limit", false, false, false, false, false, "0", false, true, true) : '';
-		    if ($album) $art = $album->getMainArt('75x75', true, "audio", true);
+		    if ($album) $art = $album->getMainArt('75x75');
 		    if(!is_array($trackfields) || in_array('thumbnail', $trackfields))  $n['thumbnail']=($art) ? $display->returnImage($art,false,75, 75, "limit", false, false, false, false, false, "0", false, true, true) : '';
-		    if(!is_array($trackfields) || in_array('id', $trackfields)) $n['id'] = $t->getID();
 		    if(!is_array($trackfields) || in_array('name', $trackfields)) $n['name'] = $meta['title'];
 		    if(!is_array($trackfields) || in_array('album', $trackfields)) $n['album'] = ($album) ? $album->getName() : '';
 		    if(!is_array($trackfields) || in_array('artist', $trackfields)) $n['artist'] = ($artist) ? $artist->getName() : '';
@@ -1404,16 +1391,15 @@ function print_results($results, $format='xml', $trackfields=false, $nodefields=
 				$artist = $album->getAncestor("artist");
 			}
 			
-		    $art = $n->getMainArt(false, true, "audio", true);
+		    $art = $n->getMainArt();
 
-		    if(!is_array($nodefields) || in_array('id', $nodefields)) $a['id']=$n->getID();
 		    if(!is_array($nodefields) || in_array('name', $nodefields)) $a['name']=$n->getName();
 		    if(!is_array($nodefields) || in_array('type', $nodefields))  $a['type']=ucwords($n->getPType());
 		    if(!is_array($nodefields) || in_array('link', $nodefields)) $a['link']=$this_site.$display->link($node,false,false,false,true,true);
 		    if(!is_array($nodefields) || in_array('album', $nodefields)) $a['album']=(empty($album)) ? '' : $album->getName();
 		    if(!is_array($nodefields) || in_array('artist', $nodefields)) $a['artist']=(empty($artist))?'':$artist->getName();
 		    if(!is_array($nodefields) || in_array('image', $nodefields)) $a['image']=($art) ? $display->returnImage($art,false,false, false, "limit", false, false, false, false, false, "0", false, true, true) : '';
-		    $art = $n->getMainArt('75x75', true, "audio", true);
+		    $art = $n->getMainArt('75x75');
 		    if(!is_array($nodefields) || in_array('thumbnail', $nodefields)) $a['thumbnail']=($art) ? $display->returnImage($art,false,75, 75, "limit", false, false, false, false, false, "0", false, true, true) : '';
 		    if(!is_array($nodefields) || in_array('playlink', $nodefields)) {
 			    if ($a['type']=='Artist' || $a['type'] == 'Genre') {
@@ -1428,16 +1414,12 @@ function print_results($results, $format='xml', $trackfields=false, $nodefields=
 		    $jn[] = $a;
 		  }
 
-		  $obj = array('tracks'=>$jt,'nodes'=>$jn);
-		  if ($queryMeta !== false) {
-		    $obj['meta'] = $queryMeta;
-		  }
 		  if ($format == 'jsonp') {
 		    echo $_GET['jsoncallback'] . '(';
-		    echo json_encode($obj);
+		    echo json_encode(array('tracks'=>$jt,'nodes'=>$jn));
 		    echo ')';
 		  } else {
-		    echo json_encode($obj);
+		    echo json_encode(array('tracks'=>$jt,'nodes'=>$jn));
 		  }
 		  
 

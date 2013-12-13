@@ -1,20 +1,20 @@
 <?php if (!defined(JZ_SECURE_ACCESS)) die ('Security breach detected.');
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *        
-	* JINZORA | Web-based Media Streamer   
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	* JINZORA | Web-based Media Streamer
 	*
-	* Jinzora is a Web-based media streamer, primarily desgined to stream MP3s 
-	* (but can be used for any media file that can stream from HTTP). 
-	* Jinzora can be integrated into a CMS site, run as a standalone application, 
+	* Jinzora is a Web-based media streamer, primarily desgined to stream MP3s
+	* (but can be used for any media file that can stream from HTTP).
+	* Jinzora can be integrated into a CMS site, run as a standalone application,
 	* or integrated into any PHP website.  It is released under the GNU GPL.
-	* 
+	*
 	* Jinzora Author:
-	* Ross Carlson: ross@jasbone.com 
+	* Ross Carlson: ross@jasbone.com
 	* http://www.jinzora.org
-	* Documentation: http://www.jinzora.org/docs	
+	* Documentation: http://www.jinzora.org/docs
 	* Support: http://www.jinzora.org/forum
 	* Downloads: http://www.jinzora.org/downloads
 	* License: GNU GPL <http://www.gnu.org/copyleft/gpl.html>
-	* 
+	*
 	* Contributors:
 	* Please see http://www.jinzora.org/modules.php?op=modload&name=jz_whois&file=index
 	*
@@ -22,13 +22,13 @@
 	* Created: 9.24.03 by Ross Carlson
 	*
 	* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-	
+
 
 	/**
 	 * Pulls the correct PHP code for a given block.
 	 * Attempts to use the given frontend,
 	 * but falls back to code in frontend/blocks.
-	 * 
+	 *
 	 * The usual call is: include(jzBlock("name"));
 	 * We do this because doing the include inside this function
 	 * can mess with variables required by the block code.
@@ -38,27 +38,27 @@
 	 */
 	function jzBlock($block) {
 		global $fe;
-		if (false !== strstr($block,'..') || 
+		if (false !== strstr($block,'..') ||
 		    false !== strstr($block,'/') ||
 		    false !== strstr($block,'\\')) {
 			die("Security breach detected (jzBlock)");
 		}
-		
+
 		if (file_exists($file = dirname(__FILE__).'/frontends/'.$fe->name.'/blocks/'.$block.'.php')) {
 	  	return $file;
 		} else {
 		  return dirname(__FILE__).'/blocks/'.$block.'.php';
 		}
 	}
-	
-	function jzTemplate($smarty, $template) {	
+
+	function jzTemplate($smarty, $template) {
 		global $fe;
-		if (false !== strstr($template,'..') || 
-			false !== strstr($template,'/') || 
+		if (false !== strstr($template,'..') ||
+			false !== strstr($template,'/') ||
 			false !== strstr($template,'\\')) {
 			die("Security breach detected (jzTemplate)");
 		}
-		
+
 		if (file_exists($file = dirname(__FILE__).'/frontends/'.$fe->name.'/templates/'.$template.'.tpl')) {
 		  $smarty->display($file);
 		}
@@ -69,39 +69,39 @@
 		}
 	}
 
-	
-	
+
+
 	/**
 	 * Handles the code for a popup function. Similar to
 	 * the block-handling function.
-	 * 
+	 *
 	 * @author Ben Dodson
 	 * @ since 8/21/2006
 	 */
 	function jzPopup($block) {
 		global $include_path;
-		if (false !== strstr($block,'..') || 
+		if (false !== strstr($block,'..') ||
 		    false !== strstr($block,'/') ||
 		    false !== strstr($block,'\\')) {
 			die("Security breach detected (jzBlock)");
 		}
-		
+
 	  	return $include_path.'popups/'.$block.'.php';
 	}
-	
+
 	class jzDisplay {
-	
+
 		/**
 		* Constructor for the class.
-		* 
+		*
 		* @author Ben Dodson
 		* @version 10/27/04
 		* @since 10/27/04
 		*/
 		function jzDisplay() {
-		
+
 		}
-				
+
 		function startCache($func, $params, $age = false){
 
 		  if (func_num_args() > 2) {
@@ -112,11 +112,11 @@
 		  }
 			return $this->_internalCacheFunc(true,$func,$params,$moreargs,$age);
 		}
-		
+
 		function endCache(){
 			return $this->_internalCacheFunc(false);
 		}
-		
+
 	  // This function is internal to the cache functions.
 	  // We use this so we can create a static variable across both functions.
 	  function _internalCacheFunc($start, $func = false, $params = false, $moreargs = false, $age = false) {
@@ -126,16 +126,16 @@
 	    if ($enable_page_caching == "false") {
 	      return false;
 	    }
-			
+
 	    if ($start) {
 	      // START THE CACHE
 	      $cacheFile = $this->createCachedPageName($func,$params,$moreargs);
-				
+
 				// Did they specify an age?
 				if ($age && is_numeric($age)){
 					$cache_age_days = $age;
 				}
-				
+
 	      if (is_file($cacheFile) and (time() - filemtime($cacheFile)) < ($cache_age_days * 86400)){
 					if ($gzip_page_cache == "true"){
 						$fp = gzopen($cacheFile,'r');
@@ -171,13 +171,13 @@
 
 		function createCachedPageName($func,$params,$moreargs){
 			global $web_root, $root_dir, $jzUSER, $security_key, $skin, $my_frontend, $enable_page_caching;
-			
+
 			if ($enable_page_caching == "false") {
 	      return false;
 	    }
-			
+
 			$signature = $skin . $my_frontend . $security_key . $func . serialize($params);
-			
+
 			if ($moreargs !== false) {
 			  for ($i = 0; $i < sizeof($moreargs); $i++) {
 			    $signature .= $moreargs[$i];
@@ -188,19 +188,19 @@
 			if (is_object($params)){
 				$name = ".". md5($params->getName());
 			}
-			
+
 			// Let's create the page
 			$pName = $web_root. $root_dir. "/temp/cache/". md5($signature . "-". $jzUSER->getID()). $name. ".html";
-			
+
 			// Now do we need to kill this file?
 			if ($_SESSION['jz_purge_file_cache'] == "true"){
 				@unlink($pName);
 			}
-			
+
 			return $pName;
 		}
-		
-		function purgeCachedPage($node){		
+
+		function purgeCachedPage($node){
 			global $web_root, $root_dir, $jzUSER,$include_path;
 
 			$name="";
@@ -216,10 +216,10 @@
 			    if (stristr($entry,$name)){
 			      @unlink($include_path."temp/cache/". $entry);
 			    }
-			  }				
+			  }
 			}
 		}
-		
+
 		/*
 		* Displays the shopping purchase button using the shopping service
 		*
@@ -230,17 +230,17 @@
 		**/
 		function purchaseButton($node){
 			global $enable_shopping, $jzSERVICES;
-			
+
 			// Is shopping enabled?
 			if ($enable_shopping <> "true"){
 				return;
 			}
-			
-			// Let's create the shopping service			
+
+			// Let's create the shopping service
 			echo $jzSERVICES->createShoppingLink($node);
 		}
-		
-		
+
+
 		/*
 		* Displays a button to allow the user to add this item to their favorites
 		*
@@ -251,25 +251,25 @@
 		**/
 		function addToFavButton($node, $return = false){
 			global $img_add_fav, $enable_favorites;
-			
+
 			if ($enable_favorites <> "true"){return;}
-			
+
 			$arr = array();
 			$arr['action'] = "popup";
 			$arr['ptype'] = "addtofavorites";
 			$arr['jz_path'] = $node->getPath("String");
-							
+
 			$retVal = '<a onClick="openPopup(' . "'". urlize($arr) ."'" . ',350,150); return false;" href="javascript:;">';
 			$retVal .= $img_add_fav;
 			$retVal .= "</a>";
-			
+
 			if ($return){
 				return $retVal;
 			} else {
 				echo $retVal;
 			}
 		}
-		
+
 		/*
 		* Displays the media mangement dropdown
 		*
@@ -304,9 +304,9 @@
 			</style>
 			<script language="JavaScript">
 				var currentPanel;
-				
+
 				function showPanel(panelNum) {
-				//hide visible panel, show selected panel, 
+				//hide visible panel, show selected panel,
 				//set tab
 				if (currentPanel != null) {
 					hidePanel();
@@ -315,14 +315,14 @@
 					currentPanel = panelNum;
 					setState(panelNum);
 				}
-				
+
 				function hidePanel() {
 					//hide visible panel, unhilite tab
 					document.getElementById('panel'+currentPanel).style.visibility = 'hidden';
 					document.getElementById('tab'+currentPanel).style.backgroundColor = '<?php echo jz_pg_bg_color; ?>';
 					document.getElementById('tab'+currentPanel).style.color = '<?php echo jz_font_color; ?>';
 				}
-				
+
 				function setState(tabNum) {
 					if (tabNum==currentPanel) {
 						document.getElementById('tab'+tabNum).style.backgroundColor = '<?php echo jz_fg_color; ?>';
@@ -332,7 +332,7 @@
 						document.getElementById('tab'+tabNum).style.color = '<?php echo jz_font_color; ?>';
 					}
 				}
-				
+
 				function hover(tab) {
 					tab.style.backgroundColor = '<?php echo jz_fg_color; ?>';
 				}
@@ -340,13 +340,13 @@
 			<?php
 			$i=1;
 			$c=5;
-			foreach ($array as $item){				
+			foreach ($array as $item){
 				echo '<div id="tab'. $i. '" class="tab" style="left: '. $c. ';" onClick="showPanel('. $i. ');" onMouseOver="hover(this);" onMouseOut="setState('. $i. ')">'. $item. '</div>';
 				$c=$c+147;
 				$i++;
 			}
 		}
-		
+
 		/*
 		* Displays the media mangement dropdown
 		*
@@ -360,7 +360,7 @@
 		  if (!is_object($node)) {
 		    $node = new jzMediaNode();
 		  }
-			?> 
+			?>
 			<form action="<?php echo $this_page; ?>" method="GET" name="toolsform">
 				<select class="jz_select" name="action" style="width:125px" onChange="openPopup(this.form.action.options[this.selectedIndex].value, 450, 450, false, 'SystemTools')">
 					<?php
@@ -380,8 +380,8 @@
 			</form>
 			<?php
 		}
-		
-		
+
+
 		/*
 		* Displays the media mangement dropdown
 		*
@@ -419,8 +419,8 @@
 						}
 					?>
 					<option value="<?php $url_array['ptype'] = "addlinktrack"; echo urlize($url_array);  ?>"><?php echo word("Add Link Track"); ?></option>
-					
-					
+
+
 					<?php
 						if ($enable_podcast_subscribe == "true"){
 					?>
@@ -428,7 +428,7 @@
 					<?php
 						}
 					?>
-					
+
 					<option value="<?php $url_array['ptype'] = "setptype"; echo urlize($url_array);  ?>"><?php echo word("Set Page Type"); ?></option>
 					<option value="<?php $url_array['ptype'] = "searchlyrics"; echo urlize($url_array);  ?>"><?php echo word("Retrieve Lyrics"); ?></option>
 					<option value="<?php $url_array['ptype'] = "getmetadata"; echo urlize($url_array);  ?>"><?php echo word("Retrieve Meta Data"); ?></option>
@@ -438,10 +438,10 @@
 						<option value="<?php $url_array['ptype'] = "getalbumart"; echo urlize($url_array);  ?>"><?php echo word("Search for Album Art"); ?></option>
 					<?php
 						}
-					?>		
+					?>
 					<?php
 						if ($resize_images == "true"){
-					?>															
+					?>
 					<option value="<?php $url_array['ptype'] = "resizeart"; echo urlize($url_array);  ?>"><?php echo word("Resize All Art"); ?></option>
 					<?php
 						}
@@ -460,10 +460,10 @@
 						if ($node->getPType() == "artist" or $node->getPType() == "album"){
 							// Ok, is it already featured?
 							if (!$node->isFeatured()){
-								$url_array['ptype'] = "addfeatured"; 
+								$url_array['ptype'] = "addfeatured";
 								echo '<option value="'. urlize($url_array). '">'. word("Add to Featured"). '</option>';
 							} else {
-								$url_array['ptype'] = "removefeatured"; 
+								$url_array['ptype'] = "removefeatured";
 								echo '<option value="'. urlize($url_array). '">'. word("Remove from Featured"). '</option>';
 							}
 						}
@@ -472,7 +472,7 @@
 						$url_array['ptype'] = "artfromtags";
 						echo '<option value="'. urlize($url_array). '">'. word("Pull art from Tag Data"). '</option>';
 					?>
-					
+
 					<?php
 						if ($node->getPType() == "album"){
 					?>
@@ -485,8 +485,8 @@
 			</form>
 			<?php
 		}
-		
-		
+
+
 		/*
 		* Displays the browse dropdown boxes
 		*
@@ -496,7 +496,7 @@
 		**/
 		function displayBrowseDropdown(){
 			global $this_page, $hierarchy;
-			
+
 			$lvls = @implode("|",$hierarchy);
 			?>
 			<form action="<?php echo $this_page; ?>" method="GET">
@@ -513,32 +513,32 @@
 					<?php
 					if (stristr($lvls,"genre")){
 						echo '<option value="';
-						$url_array['ptype'] = "genre"; 
+						$url_array['ptype'] = "genre";
 						echo urlize($url_array). '">'. word("All Genres"). ' ('. number_format($_SESSION['jz_num_genres']). ')</option>'. "\n";
 					}
-					
+
 					if (stristr($lvls,"artist")){
 						echo '<option value="';
-						$url_array['ptype'] = "artist"; 
+						$url_array['ptype'] = "artist";
 						echo urlize($url_array). '">'. word("All Artists"). ' ('. number_format($_SESSION['jz_num_artists']). ')</option>'. "\n";
 					}
-					
+
 					if (stristr($lvls,"album")){
 						echo '<option value="';
-						$url_array['ptype'] = "album"; 
+						$url_array['ptype'] = "album";
 						echo urlize($url_array). '">'. word("All Albums"). ' ('. number_format($_SESSION['jz_num_albums']). ')</option>'. "\n";
 					}
-					
+
 					echo '<option value="';
-					$url_array['ptype'] = "track"; 
+					$url_array['ptype'] = "track";
 					echo urlize($url_array). '">'. word("All Tracks"). ' ('. number_format($_SESSION['jz_num_tracks']). ')</option>'. "\n";
 					?>
 				</select>
 			</form>
-			<?php		
+			<?php
 		}
-		
-		
+
+
 		/*
 		* Returns the HTML code for a fancy Overlib tooltip
 		*
@@ -551,7 +551,7 @@
 			$overCode = "'". $body. "', CAPTION, '<nobr>". $title. "</nobr>', DELAY, 300, HAUTO, VAUTO, CAPCOLOR, '". jz_font_color. "', BORDER, 2, BGCOLOR, '". jz_pg_bg_color. "', TEXTCOLOR, '". jz_font_color. "', FGCOLOR, '". jz_fg_color. "'";
 			return ' onmouseover="return overlib('. $overCode. ');" onmouseout="return nd();"';
 		}
-		
+
 		/*
 		* Returns the text for the deminesions of an image
 		*
@@ -568,7 +568,7 @@
 				return false;
 			}
 		}
-		
+
 		/*
 		* Displays the discussion icon
 		*
@@ -579,14 +579,14 @@
 		**/
 		function displayDiscussIcon($node){
 			global $img_discuss, $img_discuss_dis;
-			
-			$item = new jzMediaElement($node->getPath('String'));		
-			
+
+			$item = new jzMediaElement($node->getPath('String'));
+
 			$arr = array();
 			$arr['action'] = "popup";
 			$arr['ptype'] = "discussitem";
 			$arr['jz_path'] = $item->getPath("String");
-							
+
 			echo '<a onClick="openPopup(' . "'". urlize($arr) ."'" . ',450,300); return false;" href="javascript:;">';
 			if ($item->getDiscussion() == ""){
 				echo $img_discuss_dis;
@@ -595,7 +595,7 @@
 			}
 			echo "</a>";
 		}
-		
+
 		/*
 		* Displays the previous artists/album this user has browsed
 		*
@@ -607,7 +607,7 @@
 		**/
 		function displayPrevDropdown($node, $type){
 			global $jzUSER, $this_page, $cms_mode;
-			
+
 			// Let's start the form
 			echo '<form action="'. $this_page. '" method="GET">'. "\n";
 			$this->hiddenPageVars();
@@ -618,10 +618,10 @@
 			if ($type == "album"){
 				echo '<option value="">'. word("Previous Albums"). '</option>';
 			}
-			
+
 			// Now let's load the users history
 			$oldHist = $jzUSER->loadData('history');
-			
+
 			// Now let's parse that our
 			$hArr = explode("\n",$oldHist);
 			$allArtists = "";
@@ -643,7 +643,7 @@
 		 * @author Ben Dodson
 		 * @since 2/2/05
 		 * @version 2/2/05
-		 * 
+		 *
 		 **/
 		function openSettingsTable($action) {
 		  echo '<table>';
@@ -681,7 +681,7 @@
 		 * @author Ben Dodson
 		 * @version 3/10/05
 		 * @since 3/10/05
-		 **/ 
+		 **/
 		function settingsCheckbox($label, $varname, &$settings_array, $show_complete = true) {
 		  // See if the array needs to be updated (from a form submit)
 		  $fieldname = "edit_" . $varname;
@@ -710,7 +710,7 @@
 		  echo "</td></tr>\n";
 		}
 
-		
+
 		/**
 		 * Completely handles a field for a setting.
 		 * This function will display a form field
@@ -720,7 +720,7 @@
 		 * @author Ben Dodson
 		 * @version 2/2/05
 		 * @since 2/2/05
-		 **/ 
+		 **/
 		function settingsTextbox($label, $varname, &$settings_array, $show_complete = true) {
 		  // See if the array needs to be updated (from a form submit)
 		  $fieldname = "edit_" . $varname;
@@ -752,7 +752,7 @@
 		 * @author Ben Dodson
 		 * @version 2/2/05
 		 * @since 2/2/05
-		 **/ 
+		 **/
 		function settingsDropdown($label, $varname, $options, &$settings_array, $show_complete = true) {
 		  // See if the array needs to be updated (from a form submit)
 		  $fieldname = "edit_" . $varname;
@@ -788,7 +788,7 @@
 		 * @author Ben Dodson
 		 * @version 2/2/05
 		 * @since 2/2/05
-		 **/ 
+		 **/
 		function settingsDropdownDirectory($label, $varname, $directory, $type = "dir", &$settings_array, $show_complete = true) {
 		  // See if the array needs to be updated (from a form submit)
 		  $fieldname = "edit_" . $varname;
@@ -804,7 +804,7 @@
 		  echo '</td><td align="left" width="70%">';
 		  echo '<select name="'.$fieldname.'" class="jz_input">';
 		  $entries = readDirInfo($directory,$type);
-		  
+
 		  foreach ($entries as $entry) {
 		    if ($entry == "CVS") {
 		      continue;
@@ -842,10 +842,10 @@
 			  $arr['command'] = $type;
 			  $arr['ptype'] = "jukebox";
 			  $arr['jz_path'] = isset($_GET['jz_path']) ? $_GET['jz_path'] : '';
-			  
+
 			  if (isset($_GET['frame'])){
 			    $arr['frame'] = $_GET['frame'];
-			  }			
+			  }
 
 			  return '<a href="'. urlize($arr). '"';
 			} else {
@@ -856,8 +856,8 @@
 
 		/**
 		* Displays the Jukebox play button
-		* 
-		* 
+		*
+		*
 		* @author Ross Carlson
 		* @version 2/9/05
 		* @since 2/9/05
@@ -865,37 +865,37 @@
 		* @param $type The type of button to display
 		*/
 		function displayJukeboxButton($type){
-			global $img_jb_play, $img_jb_pause, $img_jb_stop, 
-			  $img_jb_previous, $img_jb_next, $img_jb_random_play, 
-			  $img_jb_clear,$img_jb_repeat,$img_jb_no_repeat; 
+			global $img_jb_play, $img_jb_pause, $img_jb_stop,
+			  $img_jb_previous, $img_jb_next, $img_jb_random_play,
+			  $img_jb_clear,$img_jb_repeat,$img_jb_no_repeat;
 
 			$image = 'img_jb_'.$type;
 			$aTag = $this->getOpenJukeboxActionTag($type);
 			echo $aTag . '>'.$$image.'</a>';
 		}
-		
+
 		/*
 		 * Checks to see if the resample dropdown should be shown.
 		 * Also sets the variables required for resampling.
-		 * 
+		 *
 		 * @author Ben Dodson
 		 * @since 8/16/2006
 		 */
 		function wantResampleDropdown($node) {
 			global $allow_resample, $resampleRates, $this_page, $jzUSER, $no_resample_subnets;
-			
+
 			if ($allow_resample <> "true"){return false;}
-			
+
 			if (!checkPermission($jzUSER,'stream',$node->getPath("String"))) {
 				return false;
-			}			
+			}
 			if (checkPlayback() == "jukebox") {
 				return false;
-			}			
+			}
 			if (isset($no_resample_subnets) && $no_resample_subnets <> "" && preg_match("/^${no_resample_subnets}$/", $_SERVER['REMOTE_ADDR'])) {
 				return false;
 			}
-			
+
 			// Now let's see if they set the resample rate
 			if (isset($_POST['jz_resample'])){
 				// Ok, its set so let's set the session var for it
@@ -910,14 +910,14 @@
 				$_SESSION['jz_resample_rate'] = $jzUSER->getSetting('resample_rate');
 				return false;
 			}
-			
+
 			return true;
 		}
-		
+
 		/**
 		* Displays the resample dropdown box and related code
-		* 
-		* 
+		*
+		*
 		* @author Ross Carlson
 		* @version 11/21/04
 		* @since 11/21/04
@@ -925,19 +925,19 @@
 		*/
 		function displayResampleDropdown($node, $title = true, $return = false){
 			global $allow_resample, $resampleRates, $this_page, $jzUSER,$fe;
-			
-			
+
+
 			// First let's see if we should not show this
 			if (!$this->wantResampleDropdown($node)) {
 				return;
 			}
-			
+
 			if ($return) {
 		 		ob_start();
-			}	
-			
+			}
+
 			$smarty = smartySetup();
-			
+
 			if ($title !== false){
 				if ($title === true) {
 					$title = "";
@@ -947,7 +947,7 @@
 				}
 			}
 			$smarty->assign('title',$title);
-			
+
 			$arr = array();
 			$arr['jz_path'] = $_GET['jz_path'];
 
@@ -956,24 +956,24 @@
 			} else {
 				$smarty->assign('onchange',"return setResample(document.getElementById('resamplerate').value);");
 			}
-			
+
 			$smarty->assign('form_action',urlize($arr));
-			
+
 			if (isset($_SESSION['jz_resample_rate'])){
 				$smarty->assign('cur_rate',$_SESSION['jz_resample_rate']);
 			} else {
 				$smarty->assign('cur_rate','');
-			}			
-			
+			}
+
 			$smarty->assign('resample_rates',explode("|",$resampleRates));
-			
+
 			jzTemplate($smarty, 'block-resample');
-			
+
 			if ($return) {
 			  $var = ob_get_contents();
 			  ob_end_clean();
 			  return $var;
-			}			
+			}
 		}
 
 			/**
@@ -985,33 +985,34 @@
 			*
 			**/
 			function interfaceDropdown() {
-				global $this_page,$include_path;
-				
+				global $this_page,$web_root,$root_dir;
+
 				?>
 				<form action=<?php echo $_SERVER['PHP_SELF'] ?> method="GET" name="interface">
-					<?php 
+					<?php
 						$this->hiddenVariableField("jz_path");
 						//$this->hiddenVariableField("theme");
-						$this->hiddenPageVars(); 
+						$this->hiddenPageVars();
 					?>
-					<select class="jz_select" name="<?php echo jz_encode("set_frontend"); ?>" style="width:125px" onChange="submit();" >
-						<option value=""><?php echo word('Interface') ?></option>
-						<?php
+		          <select class="jz_select" name="<?php echo jz_encode("set_frontend"); ?>" style="width:125px" onchange="submit();" >
+			          <option value="">Interface</option>
+			          <?php
 							// Now let's get all the possibles
-							$retArray = readDirInfo($include_path. "frontend/frontends","dir");
+							$data_dir = $web_root. $root_dir. "/frontend/frontends";
+							$retArray = readDirInfo($data_dir,"dir");
 							sort($retArray);
-							for ($c=0; $c < count($retArray); $c++){	
+							for ($c=0; $c < count($retArray); $c++){
 								$entry = $retArray[$c];
-								// Let's make sure this isn't the local directory we're looking at 
+								// Let's make sure this isn't the local directory we're looking at
 								if ($entry == "." || $entry == ".." || $entry == "CVS" || $entry == "jukezora") { continue;}
 								echo '<option value="'. jz_encode(str_replace(".php","",$entry)). '">'. str_replace(".php","",$entry). '</option>'. "\n";
 							}
 						?>
-					</select>
-				</form> 
+		          </select>
+		</form>
 				<?php
 			}
-		
+
 
 		/**
 		 * The dropdown for the language selector.
@@ -1025,25 +1026,25 @@
 		  global $web_root,$root_dir,$this_page;
 		    ?>
 		    <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="GET" name="language">
-				 <?php  
+				 <?php
 					$this->hiddenVariableField("jz_path");
 					$this->hiddenPageVars();
 
-					// Now let's get all the possibles			      
+					// Now let's get all the possibles
 					$languages = getLanguageList();
 					?>
 				 <select class="jz_select" name="<?php echo jz_encode("set_language"); ?>" style="width:125px" onChange="submit()">
 			  <option value="">Language</option>
 			  <?php
 		    foreach ($languages as $language) {
-		      echo '<option value="'. jz_encode(str_replace(".php","",$language)). '">'. str_replace(".php","",$language). '</option>'. "\n";  
+		      echo '<option value="'. jz_encode(str_replace(".php","",$language)). '">'. str_replace(".php","",$language). '</option>'. "\n";
 		    }
 		    ?>
 		   	</select>
 		   	</form>
 		 		<?php
 		}
-		
+
 
 		/**
 		 * The dropdown for the style selector.
@@ -1054,29 +1055,30 @@
 		 *
 		 **/
 		function styleDropdown() {
-			global $this_page,$include_path, $cms_mode;
-			
+		  global $this_page,$root_dir,$web_root, $include_path, $cms_mode;
+
 			// Not in CMS mode...
 			if ($cms_mode == "true"){
 				return;
 			}
-       
+
 			?>
 			<form action="<?php echo $this_page; ?>" method="GET" name="style">
-				<?php 
+				<?php
 					$this->hiddenVariableField('jz_path');
 					$this->hiddenPageVars();
 					$this->hiddenVariableField('frontend');
 				?>
 				<select class="jz_select" name="<?php echo jz_encode("set_theme"); ?>" style="width:125px" onChange="submit()">
-				<option value=""><?php echo word("Style"); ?></option>			
+				<option value=""><?php echo word("Style"); ?></option>
 				<?php
 					// Now let's get all the possibles
-					$retArray = readDirInfo($include_path. "style","dir");
+					$lang_dir = $web_root. $root_dir. "/style";
+					$retArray = readDirInfo($lang_dir,"dir");
 					sort($retArray);
-					for ($c=0; $c < count($retArray); $c++){	
+					for ($c=0; $c < count($retArray); $c++){
 					$entry = $retArray[$c];
-					// Let's make sure this isn't the local directory we're looking at 
+					// Let's make sure this isn't the local directory we're looking at
 					if ($entry == "." || $entry == "..") { continue;}
 						if (!stristr($entry,"images") and !stristr($entry,"cms-theme") and !stristr($entry,"CVS")){
 							echo '<option value="'. jz_encode(str_replace(".php","",$entry)). '">'. str_replace(".php","",$entry). '</option>'. "\n";
@@ -1099,14 +1101,14 @@
 						 }
 					 }
 				}
-				
+
 				function selectStyle (vCookieName, vSelection) {
 					//WRITE COOKIE
 					//makeCookie(vCookieName, vSelection, 90, '/');
 					//ACTIVE SELECTED ALTERNAT STYLE SHEET
 					setActiveStyleSheet(vSelection)
 				}
-				
+
 				if (document.cookie.indexOf('layout=')!=-1) {
 					css = readCookie('layout');
 					//ACTIVATE SELECTED STYLE SHEET
@@ -1127,8 +1129,8 @@
 
 		/**
 		* Displays the button to allow for an item to be rated
-		* 
-		* 
+		*
+		*
 		* @author Ross Carlson
 		* @version 11/20/04
 		* @since 11/20/04
@@ -1137,7 +1139,7 @@
 		*/
 		function rateButton($node, $return = false){
 			global $img_rate, $jzUSER, $img_rate_dis, $enable_ratings;
-			
+
 			// First off can they rate?
 			if (!$jzUSER->getSetting('stream')){
 				return;
@@ -1145,23 +1147,23 @@
 			if ($enable_ratings <> "true"){
 				return;
 			}
-			
+
 			$arr = array();
 			$arr['action'] = "popup";
 			$arr['ptype'] = "rateitem";
 			$arr['jz_path'] = $node->getPath("String");
-							
+
 			$retVal = '<a onClick="openPopup(' . "'". urlize($arr) ."'" . ',350,150); return false;" href="javascript:;">';
 			$retVal .= $img_rate;
 			$retVal .= "</a>";
-			
+
 			if ($return){
 				return $retVal;
 			} else {
 				echo $retVal;
 			}
 		}
-		
+
 
 	  function emailButton($node) {
 	    global $img_email,$this_site;
@@ -1173,14 +1175,14 @@
 	      $arr['type'] = "track";
 	    }
 	    $link = $this_site. urlencode(urlize($arr));
-	    
+
 	    $artist = getInformation($node,"artist");
 	    $album = getInformation($node,"album");
 	    // hack : make 'album' trackname if that's what we're playing.
 	    if ($node->isLeaf()) {
 	      $album = $node->getName();
 	    }
-	    $mailLink = "mailto:?subject=". $artist. " - ". $album. "&body=Click to play ". 
+	    $mailLink = "mailto:?subject=". $artist. " - ". $album. "&body=Click to play ".
 	      $artist. " - ". $album . ":%0D%0A%0D%0A".
 	      $link. "%0D%0A%0D%0APowered%20by%20Jinzora%20%0D%0AJinzora%20::%20Free%20Your%20Media%0D%0Ahttp://www.jinzora.org";
 	      ?>
@@ -1192,8 +1194,8 @@
 
 		/**
 		* Displays or returns the rating for an object
-		* 
-		* 
+		*
+		*
 		* @author Ross Carlson
 		* @version 11/20/04
 		* @since 11/20/04
@@ -1202,20 +1204,20 @@
 		*/
 		function rating($node, $return = false){
 			global $img_star_full, $img_star_half_empty, $img_star_left, $img_star_right, $img_star_full_empty, $include_path, $img_star_full_raw, $img_star_empty_raw;
-			
+
 			// Let's increment the counter
 			$_SESSION['jz_stars_group']++;
-			
+
 			// Let's grab the rating from the node
 			$rating = estimateRating($node->getRating());
-			
+
 			// First lets see if we should just return if this is nothing
 			if (!$rating){return;}
-						
+
 			// Now let's start the rating icon
 			$retVal .= $img_star_left;
 			$total_rating = $rating;
-		
+
 			for ($i = floor($rating); $i > 0; $i--){
 				$retVal .= $img_star_full;
 			}
@@ -1225,11 +1227,11 @@
 			// Now we need to finish this off to make 5
 			for ($i = ceil($rating); $i < 5; $i++) {
 				$retVal .= $img_star_full_empty;
-			}					
-			
+			}
+
 			// Now let's finish it off
 			$retVal .= $img_star_right;
-			
+
 			if ($return){
 				return $retVal;
 			} else {
@@ -1292,7 +1294,7 @@
 					}
 				}
 
-				// Stop once we find $end characters 
+				// Stop once we find $end characters
 				if( ($currentPos-$nonDisplayTextCounter) == $end ) {
 					break;
 				}
@@ -1302,11 +1304,11 @@
 
 			return substr( $text, 0, $currentPos);
 }
-		
+
 		/**
 		* Returns a shortened version of the given $text.
-		* 
-		* 
+		*
+		*
 		* @author Ross Carlson
 		* @version 11/17/04
 		* @since 11/17/04
@@ -1329,16 +1331,16 @@
 		    return trim($retText). "...";
 			}
 		}
-	  
+
 		/**
 		* Displays a link for the node. (or a playlink for the path)
-		* 
-		* 
+		*
+		*
 		* @author Ben Dodson
 		* @version 11/4/04
 		* @since 11/4/04
 		*/
-		function link($node, $text = false, $title = false, $class = false, $return = false, $linkonly = false, $playRandom = false, $playlist = false, $target = false) {		
+		function link($node, $text = false, $title = false, $class = false, $return = false, $linkonly = false, $playRandom = false, $playlist = false, $target = false) {
 		  if (!is_object($node)) {
 		    return false;
 		  }
@@ -1357,15 +1359,15 @@
 			if (isset($_GET['frame'])){
 				$arr['frame'] = $_GET['frame'];
 			}
-			
+
 			if (!defined('NO_AJAX_LINKS')) {
 			  $arr['maindiv'] = "true";
 			}
-			
+
 			// Let's start the link
 			if (!$linkonly){
 			  if (defined('NO_AJAX_LINKS')) {
-			    $linkText = '<a href="' . urlize($arr). '"';
+			    $linkText = '<a href="' . urlize($arr).'&flvquality='.$quality.'"';
 			  } else {
 			    $linkText = '<a href="javascript:maindiv(\''.urlencode(urlize($arr)).'\')"';
 			  }
@@ -1376,8 +1378,9 @@
 			    $linkText = 'javascript:maindiv(\''.urlencode(urlize($arr)).'\')';
 			  }
 			  return $linkText;
+
 			}
-			
+
 			// Did they pass text or do we need to figure it out?
 			if (!$text) {
 				$text = $node->getName();
@@ -1389,32 +1392,33 @@
 			if ($title){
 				$linkText .= ' title="'. $title. '" alt="'. $title. '"';
 			}
-			
+
 			// Did they pass a class?
 			if ($class){
 				$linkText .= ' class="'. $class. '"';
 			}
-			
+
 			// Did they want a target?
 			if ($target){
 				$linkText .= ' target="'. $target. '"';
 			}
-			
+
 			// Now let's finish out
 			$linkText .= '>'. $text. '</a>';
-			
+
 			// Now let's echo it out
 			if (!$return){
 				echo $linkText;
+
 			} else {
 				return $linkText;
 			}
 		}
-		
+
 		/**
 		* Displays a link for the node. (or a playlink for the path)
-		* 
-		* 
+		*
+		*
 		* @author Ben Dodson
 		* @version 11/30/04
 		* @since 11/30/04
@@ -1434,19 +1438,19 @@
 		  }
 		  return "<a href=\"\" onclick=\"ajax_direct_call('".urlize(array('action'=>'addToPlaylist','jz_path'=>$e->getPath('String'),'type'=>$type))."',updatePlaylist_cb); return false;\" ";
 		}
-		function getOpenPlayTag($node, $random = false, $limit = 0) { 
+		function getOpenPlayTag($node, $random = false, $quality="", $limit = 0) {
 		  global $jzUSER,$jzSERVICES,$jukebox;
 		  if (!is_object($node)){return;}
-		  
+
 		  // do they have permissions or should we just do text?
 		  if ($node instanceof jzMediaElement && !checkPermission($jzUSER,"play",$node->getPath("String"))) {
 		    return null;
-		  } 
+		  }
 
 		  $href = $node->getPlayHREF($random,$limit);
 		  // Let's start the link
 		  if (defined('NO_AJAX_JUKEBOX') || $jukebox == "false") {
-		    $linkText = '<a href="' . $href. '"';
+		    $linkText = '<a href="' . $href.'&flvquality='.$quality. '"';
 		    // Now are they using a popup player?
 		    if (checkPlayback() == "embedded"){
 		      // Ok, let's put the popup in the href
@@ -1460,10 +1464,11 @@
 
 		  return $linkText;
 		}
-		  
-		  
 
-		function playLink($node, $text = false, $title = false, $class = false, $return = false, $random = false, $linkOnly = false, $clips = false, $limit = 0) {		
+
+
+		function playLink($node, $text = false, $title = false, $class = false, $return = false, $random = false, $linkOnly = false, $clips = false, $quality="mobile")
+		{
 			global $jzUSER, $jzSERVICES,$jukebox;
 
 			$linkText = $this->getOpenPlayTag($node,$random,$limit);
@@ -1475,11 +1480,11 @@
 			}
 			if ($class){
 				$linkText .= ' class="'. $class. '"';
-			}			
-			
+			}
+
 			// Now let's finish out
 			$linkText .= '>'. $text. '</a>';
-			
+
 			// Now let's echo it out
 			if (!$return){
 				echo $linkText;
@@ -1487,48 +1492,48 @@
 				return $linkText;
 			}
 		}
-		
-		
+
+
 		/**
 		* Displays a podcast link for a node
-		* 
-		* 
+		*
+		*
 		* @author Ross Carlson
 		* @version 7/8/2005
 		* @since 7/8/2005
 		* @param $node Object the node we are looking at
 		*/
-		function podcastLink($node, $return = true) {		
+		function podcastLink($node, $return = true) {
 			global $root_dir, $img_podcast, $enable_podcast, $web_dirs, $this_site;
-			
+
 			if (!is_object($node)){return;}
 			if ($enable_podcast <> "true"){return;}
-			
+
 			$site = str_replace("http://","",$this_site);
 			$site = str_replace("https://","",$site);
-			
+
 			if ($return){
 				return '<a href="itpc://'. $site. $root_dir. '/podcast.rss?jz_path='. $node->getPath("String"). '">'. $img_podcast. '</a>';
 			} else {
 				echo '<a href="itpc://'. $site. $root_dir. '/podcast.rss?jz_path='. $node->getPath("String"). '">'. $img_podcast. '</a>';
 			}
 		}
-		
-		
+
+
 		/**
 		* Displays a download button for the node or track or playlist.
-		* 
-		* 
+		*
+		*
 		* @author Ross Carlson
 		* @version 12/01/04
 		* @since 12/01/04
 		*/
-		function downloadButton($node, $return = false, $returnImage = false, $showSize = false, $linkOnly = false) {			
+		function downloadButton($node, $return = false, $returnImage = false, $showSize = false, $linkOnly = false) {
 			global $img_download, $img_download_dis, $jzUSER, $jzSERVICES, $allow_resample_downloads, $allow_resample, $display_downloads;
 
 			if ($display_downloads == "false") {
 				return;
-			}	
+			}
 			if (!$jzUSER->getSetting('download')){
 			  if ($return){
 			    return $img_download_dis;
@@ -1542,7 +1547,7 @@
 
 			$arr = array();
 			$arr['action'] = "download";
-			
+
 			if (isset($_GET['frame'])){
 				$arr['frame'] = $_GET['frame'];
 			}
@@ -1551,19 +1556,19 @@
 			  $arr['type'] = "playlist";
 			  $arr['jz_pl_id'] = $node->getID();
 			} else {
-			  $arr['jz_path'] = $node->getPath("String");	
+			  $arr['jz_path'] = $node->getPath("String");
 			  if ($node->isLeaf()) {
 			    $arr['type'] = "track";
 			  }
 			}
 			// NOTE: be careful because this could be a downloadButton for a jzPlaylist.
 			//$fileExt = substr($node->getPath("String"),-3);
-			
+
 			// Now let's get the stats so we'll know how big this album is
 			if ($showSize){
 				$size = $node->getStats("total_size_str");
 			}
-			
+
 			// Now, do we need to make this a popup page?
 			// This is used for transcoding downloading
 			// First is this an album or a track?
@@ -1586,63 +1591,64 @@
 				$arr['action'] = "popup";
 				$arr['ptype'] = "downloadtranscode";
 				$arr['jz_path'] = $node->getPath("String");
-				$popupAddon = ' target="_blank" onclick="openPopup(this, 400, 400); return false;" ';	
+				$popupAddon = ' target="_blank" onclick="openPopup(this, 400, 400); return false;" ';
 			} else {
 				$popupAddon = "";
 			}
-			
+
 			if ($linkOnly){
 				return urlize($arr);
+
 			}
-			
-			if (!$return){	
+
+			if (!$return){
 				$message = word("Download"). ": ". $node->getName();
 				if (isset($size)){
 					$message .= " : ". $size;
 				}
 				if ($returnImage) {
-					return '<a title="'. $message. '" href="'. urlize($arr) . '" '. $popupAddon. '>' . $img_download .  '</a>';   
+					return '<a title="'. $message. '" href="'. urlize($arr) . '" '. $popupAddon. '>' . $img_download .  '</a>';
 				}
 				echo '<a title="'. $message. '" href="'. urlize($arr). '"'. $popupAddon. '>';
 				echo $img_download;
 				echo "</a>";
 			} else {
 				if ($returnImage) {
-					return '<a title="'. $message. '" href="'. urlize($arr) . '" '. $popupAddon. '>'. $img_download. '</a>';   
+					return '<a title="'. $message. '" href="'. urlize($arr) . '" '. $popupAddon. '>'. $img_download. '</a>';
 				} else {
 					return urlize($arr);
 				}
 			}
 		}
-		
+
 		/**
 		* Displays a clip play button for the node or track or playlist.
-		* 
-		* 
+		*
+		*
 		* @author Ross Carlson
 		* @version 3/07/05
 		* @since 3/07/05
 		* @param $node the Node we are looking at
 		*/
-		function clipPlayButton($node) {			 
+		function clipPlayButton($node) {
 			global $img_clip, $jzUSER, $jzSERVICES;
-			
+
 			if ($node->getType() == "jzPlaylist" || !$node->isLeaf()) {
 				return;
 			}
 
 			$arr = array();
-			$arr['action'] = "playlist";			
+			$arr['action'] = "playlist";
 
 			if (isset($_GET['frame'])){
 				$arr['frame'] = $_GET['frame'];
 			}
-			
-			$arr['jz_path'] = $node->getPath("String");	
+
+			$arr['jz_path'] = $node->getPath("String");
 			$arr['type'] = "track";
 			$arr['clip'] = "true";
 
-			echo '<a href="' . urlize($arr) . '"';
+			echo '<a href="' . urlize($arr) .'&flvquality='.$quality. '"';
 
 			// Now are they using a popup player?
 			if (checkPlayback() == "embedded"){
@@ -1650,40 +1656,40 @@
 				echo $jzSERVICES->returnPlayerHref();
 			}
 
-			echo '>';			
+			echo '>';
 			echo $img_clip;
 			echo "</a>";
 		}
-		
-		
+
+
 		/**
 		* Displays a lofi play button for the node or track or playlist.
-		* 
-		* 
+		*
+		*
 		* @author Ross Carlson
 		* @version 3/07/05
 		* @since 3/07/05
 		* @param $node the Node we are looking at
 		*/
-		function lofiPlayButton($node, $limit = false, $text = false, $onclick = false) {			
+		function lofiPlayButton($node, $limit = false, $text = false, $onclick = false) {
 			global $img_lofi, $jzUSER, $jzSERVICES;
-			
+
 			if ($jzUSER->getSetting('lofi') === false) {
 			  //return;
 			}
 
 			$arr = array();
 			$arr['action'] = "playlist";
-			
+
 			if (isset($_GET['frame'])){
 				$arr['frame'] = $_GET['frame'];
 			}
-			
+
 			if ($node->getType() == "jzPlaylist") {
 				$arr['type'] = "playlist";
 				$arr['pl_id'] = $node->getID();
 			} else {
-				$arr['jz_path'] = $node->getPath("String");	
+				$arr['jz_path'] = $node->getPath("String");
 				if ($node->isLeaf()) {
 					$arr['type'] = "track";
 				} else {
@@ -1701,17 +1707,17 @@
 				// Ok, let's put the popup in the href
 				echo $jzSERVICES->returnPlayerHref();
 			}
-			
-			echo '>';			
+
+			echo '>';
 			echo $img_lofi;
 			echo "</a>";
 		}
-		
+
 
 		/**
 		* Displays a play button for the node or track or playlist.
-		* 
-		* 
+		*
+		*
 		* @author Ben Dodson
 		* @version 1/15/05
 		* @since 11/4/04
@@ -1719,9 +1725,9 @@
 		* @param $limit should we limit the items to play (default is false)
 		* @param $text The text to display in the link
 		*/
-		function playButton($node, $limit = false, $text = false, $onclick = false, $return = false) {  
+		function playButton($node, $limit = false, $text = false, $onclick = false, $return = false) {
 		  global $img_play, $img_play_dis, $jzUSER, $jzSERVICES,$jukebox;
-		  
+
 		  if (!is_object($node)) {
 		    return false;
 		  }
@@ -1740,19 +1746,19 @@
 				}
 			}
 			$retVal='';
-			
+
 			$arr = array();
 			$arr['action'] = "playlist";
-			
+
 			if (isset($_GET['frame'])){
 				$arr['frame'] = $_GET['frame'];
 			}
-			
+
 			if ($node->getType() == "jzPlaylist") {
 				$arr['type'] = "playlist";
 				$arr['pl_id'] = $node->getID();
 			} else {
-				$arr['jz_path'] = $node->getPath("String");	
+				$arr['jz_path'] = $node->getPath("String");
 				if ($node->isLeaf()) {
 					$arr['type'] = "track";
 				} else {
@@ -1776,14 +1782,14 @@
 			  }
 			}
 
-			$retVal .= '>';			
+			$retVal .= '>';
 			if ($text === false) {
 			  $retVal .= $img_play;
 			} else {
 			  $retVal .= $text;
 			}
 			$retVal .= "</a>";
-			
+
 			if ($return){
 				return $retVal;
 			} else {
@@ -1819,44 +1825,44 @@
 		  echo '<a href="' . urlize(array()) . '">';
 		  echo $img_home;
 		  echo '</a>';
-		}	
-		
+		}
+
 		/**
 		* Displays a the radio button for the node and it's similar nodes
-		* 
-		* 
+		*
+		*
 		* @author Ross Carlson
 		* @version 01/15/05
 		* @since 01/10/05
 		*/
-		function radioPlayButton($node, $limit = false, $text = false) {			
+		function radioPlayButton($node, $limit = false, $text = false) {
 			global $img_play, $jzUSER, $img_play_dis, $jzSERVICES;
-			
+
 			if (checkPermission($jzUSER,'play',$node->getPath('String')) === false){
 				echo $img_play_dis;
 				return;
 			}
-			
+
 			$simArray = $jzSERVICES->getSimilar($node);
 			$simArray = seperateSimilar($simArray);
-			
+
 			if (sizeof($simArray['matches']) == 0) {
 				return false;
 			}
-			
+
 			$arr = array();
 			$arr['action'] = "playlist";
 			$arr['mode'] = "radio";
 			if ($limit !== false) {
 			  $arr['limit'] = $limit;
 			}
-										
+
 			if ($node->getType() == "jzPlaylist") {
 				$arr['type'] = "playlist";
 			} else {
 				$arr['jz_path'] = $node->getPath("String");
 			}
-			
+
 			echo '<a href="' . urlize($arr) . '"';
 			// Now are they using a popup player?
 			if (checkPlayback() == "embedded"){
@@ -1872,17 +1878,17 @@
 			}
 			echo "</a>";
 			return true;
-		}	
-		
+		}
+
 		/**
 		* Displays a random play button for the node.
-		* 
-		* 
+		*
+		*
 		* @author Ben Dodson
 		* @version 1/15/05
 		* @since 11/4/04
 		*/
-		function randomPlayButton($node, $limit = false, $text = false, $onclick = false, $return = false) {  
+		function randomPlayButton($node, $limit = false, $text = false, $onclick = false, $return = false) {
 		  global $img_random_play, $img_random_play_dis, $jzUSER, $jzSERVICES,$jukebox;
 
 		  if (!is_object($node)) {
@@ -1904,7 +1910,7 @@
 				}
 			}
 			$retVal='';
-			
+
 			$arr = array();
 			$arr['action'] = "playlist";
 			$arr['mode'] = "random";
@@ -1914,13 +1920,13 @@
 			if (isset($_GET['frame'])){
 				$arr['frame'] = $_GET['frame'];
 			}
-							
+
 			if ($node->getType() == "jzPlaylist") {
 				$arr['type'] = "playlist";
 			} else {
 				$arr['jz_path'] = $node->getPath("String");
 			}
-			
+
 			// So links can be copy/pasted when not in jukebox:
 			if ($jukebox == "false") {
 			  $retVal .= '<a href="' . urlize($arr) . '"';
@@ -1936,21 +1942,21 @@
 			  $retVal .= '<a href="'. htmlentities(urlize($arr))  . '"';
 			  $retVal .= " onClick=\"return playbackLink('".htmlentities(urlize($arr))."')\"";
 			}
-			$retVal .= '>';			
+			$retVal .= '>';
 			if ($text === false) {
 			  $retVal .= $img_random_play;
 			} else {
 			  $retVal .= $text;
 			}
 			$retVal .= "</a>";
-			
+
 			if ($return){
 				return $retVal;
 			} else {
 				echo $retVal;
 			}
 		}
-		
+
 		/**
 		 * Displays a button for the node's statistics
 		 *
@@ -1959,9 +1965,9 @@
 		 * @version 1/29/05
 		 *
 		 **/
-		function statsButton($node, $text = false, $return = false) {
+		function statsButton($node, $text = false) {
 		  global $img_more, $jzUSER;
-		  
+
 		  if (!$jzUSER->getSetting('admin')){return;}
 
 		  $arr = array();
@@ -1972,13 +1978,7 @@
 		  if ($text === false) {
 		    $text = $img_more;
 		  }
-		  $linkText = ' <a href="'. urlize($arr). '" onclick="openPopup(this, 450, 450); return false;">'. $text. '</a>';
-		  if ($return) {
-		    return $linkText;
-		  }
-		  else {
-		    echo $linkText;
-		  }
+		  echo ' <a href="'. urlize($arr). '" onclick="openPopup(this, 450, 450); return false;">'. $text. '</a>';
 
 		}
 
@@ -1995,7 +1995,7 @@
 
 			$label = 'addbutton'.++$my_id;
 			$retVar  = '<input type="button" style="display:none;" id="'.$label.'" value="true" name="' . jz_encode("addList") . '"/>';
-						
+
 			$onclick = 'submitPlaybackForm(document.getElementById(\''.$label.'\'), \'' . htmlentities($this_page)  . '\')';
 
 			$retVar .= icon('add',array( 'title'=> word('Add to'),
@@ -2010,7 +2010,7 @@
 				echo $retVar;
 			}
 		}
-		
+
 		/**
 		 * Displays a select box with all the playlists listed
 		 *
@@ -2023,10 +2023,10 @@
 		 **/
 		function playlistSelect($width, $onchange = false, $type = "static", $session_pl = true, $varname = "jz_playlist", $return = false){
 		  global $jzUSER;
-			
+
 			$display = new jzDisplay();
 			$retVal = "";
-			
+
 			$retVal .= $display->openSelect($varname, $width, $onchange, true);
 			if ($session_pl && ($type != "dynamic")) {
 			  $retVal .= '<option value= "session">'. word(" - Session Playlist - "). '</option>'. "\n";
@@ -2034,11 +2034,11 @@
 			$lists = $jzUSER->listPlaylists($type);
 			foreach ($lists as $id=>$pname) {
 			  $retVal .= '<option value="'.$id.'"';
-			  if ($_SESSION['jz_playlist'] == $id) { $retVal .= " selected"; } 
+			  if ($_SESSION['jz_playlist'] == $id) { $retVal .= " selected"; }
 			  $retVal .= '>' . $pname . '</option>'."\n";
 			}
 			$retVal .= $display->closeSelect(true);
-			
+
 			if ($return){
 				return $retVal;
 			} else {
@@ -2057,7 +2057,7 @@
 		function sendListButton($random = false, $return = true) {
 			global $root_dir, $skin,$this_page;
 			static $my_id = 0;
-			
+
 			$label = 'playnowbutton'.++$my_id;
 			$retVal = '<input type="button" style="display:none;" id="'.$label.'" value="true" name="';
 			if ($random){
@@ -2068,7 +2068,7 @@
 				$retVal .= jz_encode("sendList");
 				$title = word("Play selected");
 				$icon = 'play';
-			} 
+			}
 			$retVal .= '"';
 
 			$onclick = 'submitPlaybackForm(document.getElementById(\''.$label.'\'), \'' . htmlentities($this_page)  . '\')';
@@ -2085,7 +2085,7 @@
 			  echo $retVal;
 			}
 		}
-		
+
 		/**
 		 * A form button to play the current playlist.
 		 *
@@ -2095,7 +2095,7 @@
 		function playListButton($return = false) {
 			global $jzSERVICES,$this_page;
 			static $my_id = 0;
-			
+
 			$label = "playlistbutton" . ++$my_id;
 			$retVal = '<input id="'.$label.'" style="display:none;" type="submit" name="'.jz_encode("playplaylist").'" value="'.jz_encode('normal').'">';
 			if (!defined('NO_AJAX_JUKEBOX')) {
@@ -2104,7 +2104,7 @@
 			  // Ok, let's put the popup in the href
 			  $onclick = $this->embeddedFormHandler('playlistForm');
 			}
-			
+
 			$retVal .= icon('play',array( 'title'=> word('Play'),
 						      'onclick'=> $onclick
 						      )
@@ -2128,14 +2128,14 @@
 
                         $label = "randomizebutton" . ++$my_id;
 			$retVal = '<input type="submit" style="display:none;" name="'.jz_encode("playplaylist").'" value="'.jz_encode('random').'">';
-			
+
 			if (!defined('NO_AJAX_JUKEBOX')) {
 			   $onclick = 'submitPlaybackForm(document.getElementById(\''.$label.'\'), \'' . htmlentities($this_page)  . '\')';
 			} else if (checkPlayback() == "embedded"){
 			  // Ok, let's put the popup in the href
 			  $onclick = $this->embeddedFormHandler('playlistForm');
 			}
-			 
+
 			$retVal .= icon('random',array( 'title'=> word('Play Random'),
                                                       'onclick'=> $onclick
                                                       )
@@ -2147,7 +2147,7 @@
 				echo $retVal;
 			}
 		}
-		
+
 		/**
 		 * A form button to download the current playlist.
 		 *
@@ -2160,10 +2160,10 @@
 
 		  $label = "downloadbutton" . ++$my_id;
 		  $retVal = '<input type="submit" style="display:none;" id="'.$label.'" name="'.jz_encode("downloadlist").'" value="'.jz_encode('true').'">';
-		  
+
 		  $onclick = 'submitPlaybackForm(document.getElementById(\''.$label.'\'), \'' . htmlentities($this_page)  . '\')';
-		  
-		  $retVal .= icon('download',array( 'title'=> word('Download Playlist'),
+
+		  $retVal .= icon('download',array( 'title'=> word('Play Random'),
 						  'onclick'=> $onclick
 						  )
 				  );
@@ -2188,10 +2188,10 @@
 		  $label = "createbutton" . ++$my_id;
 		  $retVal  = '<input type="submit" style="display:none;" id="'.$label.'" name="'.jz_encode("createlist").'" value="'.jz_encode('true').'"';
 		  $retVal .= " onclick=\"variablePrompt('playlistForm','playlistname','".word('Please enter a name for your playlist.')."')\">";
-		  
+
 		  $onclick = 'submitPlaybackForm(document.getElementById(\''.$label.'\'), \'' . htmlentities($this_page)  . '\')';
 
-		  $retVal .= icon('add',array( 'title'=> word('Create Playlist'),
+		  $retVal .= icon('add',array( 'title'=> word('Play Random'),
 						  'onclick'=> $onclick
 						  )
 				  );
@@ -2213,15 +2213,7 @@
 		 *
 		 */
 		function loginLink($logintext = false, $logouttext = false, $registration = true, $regtext = false, $return_link = false) {
-		  global $jzUSER, $http_auth_enable;
-
-		  if (isset($http_auth_enable) && $http_auth_enable == "true") {
-		    if ($return_link) {
-		      return "";
-		    } else {
-		      return;
-		    }
-		  }
+		  global $jzUSER;
 
 		  $array = array();
 		  if ($jzUSER->getID() == $jzUSER->lookupUID('NOBODY')) {
@@ -2267,8 +2259,8 @@
 		/**
 		* Displays a link for the specified popup.
 		* $type is one of: genre, artist, album
-		* 
-		* 
+		*
+		*
 		* @author Ben Dodson
 		* @version 11/7/04
 		* @since 10/27/04
@@ -2279,9 +2271,9 @@
 			$args = array();
 			$args['action'] = "popup";
 			$tag = 'target="_blank"';
-			
+
 			$root = &new jzMediaNode();
-			
+
 			switch ($type) {
 				case "genre":
 					$args['ptype'] = "genre";
@@ -2294,7 +2286,7 @@
 						$text = "Genres: " . number_format($_SESSION['jz_num_genres']);
 					}
 					break;
-				
+
 				case "artist":
 					$args['ptype'] = "artist";
 					$tag .= " onclick=\"openPopup(this, 400, 400, false, 'Artists'); return false;\"";
@@ -2305,7 +2297,7 @@
 						$text = "Artists: " . number_format($_SESSION['jz_num_artists']);
 					}
 					break;
-				
+
 				case "album":
 					$args['ptype'] = "album";
 					$tag .= " onclick=\"openPopup(this, 400, 400, false, 'Albums'); return false;\"";
@@ -2316,7 +2308,7 @@
 						$text = "Albums: " . number_format($_SESSION['jz_num_albums']);
 					}
 					break;
-				
+
 				case "track":
 						$args['ptype'] = "track";
 					$tag .= " onclick=\"openPopup(this, 400, 400, false, 'Tracks'); return false;\"";
@@ -2341,7 +2333,7 @@
 					$url = $root_dir . "/slim.php";
 					if (isset($_GET['jz_path'])) {
 						$url .= "?" . jz_encode("jz_path") ."=". jz_encode($_GET['jz_path']);
-					}	
+					}
 					$tag .= " onclick=\"openPopup(this, 300, 400, false, 'Slimzora'); return false;\"";
 					if ($text === false) {
 						$text = $img_slim_pop;
@@ -2357,8 +2349,8 @@
 					}
 			    $linky = $include_path."jukezora.php";
 					$jukezora_link = '<a class="jz_header_table_href" href="javascript:;" onClick="openPopup(\''.$linky.'\',320,600); return false;" title="Launch Jukezora">'.$text.'</a>';
-					if ($return) { return $jukezora_link; } 
-					else { 
+					if ($return) { return $jukezora_link; }
+					else {
 							echo $jukezora_link;
 					 }
 					return;
@@ -2368,7 +2360,7 @@
 					$tag .= " onclick=\"openPopup(this, 550, 600); return false;\"";
 					$text = $img_more;
 					break;
-				
+
 				case "admintools":
 					if ($jzUSER->getSetting('admin') == true){
 						$args['ptype'] = "admintools";
@@ -2377,7 +2369,7 @@
 						$text = $img_tools;
 					}
 					break;
-				
+
 				case "plmanager":
 						$args['ptype'] = "playlistedit";
 						$tag .= "onClick=\"openPopup(this,600,600); return false;\"";
@@ -2386,8 +2378,8 @@
 						}
 						break;
 					}
-				
-			
+
+
 				if ($return) {
 					if ($linkOnly){
 						return urlize($args);
@@ -2398,10 +2390,10 @@
 					echo "<a class=\"jz_header_table_href\" href=\"".urlize($args)."\" $tag>$text</a>";
 			 }
 		}
-		
+
 		/**
 		* Displays or returns an image.
-		*  
+		*
 		* @author Ben Dodson
 		* @version 11/10/04
 		* @since 11/10/04
@@ -2423,10 +2415,10 @@
 		function image($path, $alt = false, $width = false, $height = false, $method = "limit", $gd = false, $save = false, $align = false, $hspace = false, $vspace = false, $border = "0") {
 			echo $this->returnImage($path,$alt,$width,$height,$method,$gd,$save,$align,$hspace,$vspace,$border);
 		}
-		
+
 		/**
 		* Resizes and image if it needs it
-		*  
+		*
 		* @author Ross Carlson
 		* @version 2/24/05
 		* @since 2/24/05
@@ -2436,26 +2428,26 @@
 		*/
 		function resizeImage($path, $destination_width, $destination_height){
 			global $keep_porportions;
-			
+
 			// First we need to be sure that they have GD support
 			if (gd_version() == 0){
 				return false;
 			}
-			
+
 			// Ok, now let's resize
 			$image = $path;
 			$new_image = $path. ".new";
-			
+
 			// Let's grab the source image that was uploaded to work with it
 			$src_img = @imagecreatefromjpeg($image);
-			
+
 			if ($src_img){
 				// Let's get the width and height of the source image
 				$src_width = imagesx($src_img); $src_height = imagesy($src_img);
-				
+
 				// Let's set the width and height of the new image we'll create
 				$dest_width = $destination_width; $dest_height = $destination_height;
-				
+
 				// Now if the picture isn't a standard resolution (like 640x480) we
 				// need to find out what the new image size will be by figuring
 				// out which of the two numbers is higher and using that as the scale
@@ -2478,76 +2470,76 @@
 					$dest_height = $destination_height;
 					$dest_width = $destination_width;
 				}
-				
+
 				// Now let's create our destination image with our new height/width
 				if (gd_version() >= 2) {
 					$dest_img = imageCreateTrueColor($dest_width, $dest_height);
 				} else {
 					$dest_img = imageCreate($dest_width, $dest_height);
 				}
-				
+
 				/* Now let's copy the data from the old picture to the new one with the new settings */
 				if (gd_version() >= 2) {
 					imageCopyResampled($dest_img, $src_img, 0, 0, 0 ,0, $dest_width, $dest_height, $src_width, $src_height);
 				} else {
 					imageCopyResized($dest_img, $src_img, 0, 0, 0 ,0, $dest_width, $dest_height, $src_width, $src_height);
 				}
-				
+
 				/* Now let's create our new image */
 				@imagejpeg($dest_img, $new_image);
-				
+
 				/* Now let's clean up all our temp images */
 				imagedestroy($src_img);
 				imagedestroy($dest_img);
-				
+
 				// Now we need to kill the old image and move the new one into it's place
 				unlink($image);
 				rename($new_image,substr($new_image,0,-4));
-				
+
 				return true;
 			} else {
 				return false;
 			}
 		}
-		
+
 		/**
 		* Same as the above, but returns it instead of displaying it.
 		* Useful for use in links.
-		*  
+		*
 		* @author Ben Dodson
 		* @version 11/10/04
 		* @since 11/10/04
 		*/
 		function returnImage ($path, $alt = false, $width = false, $height = false, $method = "limit", $gd = false, $save = false, $align = false, $hspace = false, $vspace = false, $border = "0", $class = false, $linkOnly = false) {
 			global $album_img_width, $album_img_height, $allow_filesystem_modify, $root_dir;
-			
+
 			$art = jzCreateLink($path,"image");
 
 			if ($linkOnly){
 				return $art;
 			}
-			
+
 			$tag = "";
 			if ($alt !== false)
 				$tag .= "alt=\"$alt\" ";
 				$tag .= "title=\"$alt\" ";
-			
+
 			if ($method == "fixed") {
 			  if ($width !== false)
 			    $tag .="width=\"$width\" ";
 			  if ($height !== false)
 			    $tag .= "height=\"$height\"";
-			} else {	
+			} else {
 			  $size = @getimagesize($path);
 			  $displaywidth = $size[0];
-			  $displayheight = $size[1];			
+			  $displayheight = $size[1];
 
 			  if ($size && $size[0] > 0 && $size[1] > 0) {
 			    switch ($method) {
 			    case "limit":
 			      if ($width !== false && $width < $displaywidth) {
 							$displayheight = (int)($displayheight * $width / $displaywidth);
-							$displaywidth = $width;					
+							$displaywidth = $width;
 			      } if ($height && $height < $displayheight) {
 							$displaywidth = (int)($displaywidth * $height / $displayheight);
 							$displayheight = $height;
@@ -2574,22 +2566,22 @@
 			if ($hspace){
 				$tag .= ' hspace="'. $hspace. '" '; }
 			if ($class){
-				$tag .= ' class="'. $class. '" '; }			
+				$tag .= ' class="'. $class. '" '; }
 			// Now let's set the border
 			$tag .= ' border="'. $border. '" ';
-				
+
 			return "<img src=\"" . $art . "\" $tag>";
 		}
-		
-		
+
+
 		/**
 		* Shows a dropdown.
-		* 
+		*
 		* Example:
-		* 		
+		*
 		* $display = &new jzDisplay();
 		* $display->dropdown("genre");
-		* 
+		*
 		* @author Ben Dodson
 		* @version 10/27/04
 		* @since 10/27/04
@@ -2598,10 +2590,10 @@
 		  global $hierarchy, $quick_list_truncate;
 			$TRUNC = 12;
 			$var = $type . "-dropdown";
-			
+
 			$string = "";
 			$width = "130px";
-						
+
 			$retVar = '<select name="'. jz_encode($select_name) . '"';
 			if ($on_submit) {
 			  $retVar .= ' onChange="submit()"';
@@ -2609,10 +2601,10 @@
 			$retVar .= ' class="jz_select" style="width: '. $width. ';">'. "\n";
 			$retVar .= $this->optionList($type,false,true,$root);
 			$retVar .= "</select>\n";
-			
+
 			// Now let's set the cached variable
 			$_SESSION[$var] = $retVar;
-			
+
 			// Now let's display
 			if ($return){
 				return $retVar;
@@ -2624,7 +2616,7 @@
 		/**
 		* Echos a list of items of the given type.
 		*
-		* @author Ben Dodson		
+		* @author Ben Dodson
 		* @version 1/12/05
 		* @since 1/12/05
 		* @param $type the type of the dropdown (genre/artist/album/track)
@@ -2633,7 +2625,7 @@
 		*/
 		function optionList($type, $chosen = false, $returnOnly = false, $node = false) {
 			global $hierarchy, $quick_list_truncate;
-		
+
 			$string = "";
 			if ($node === false) {
 				$node = &new jzMediaNode();
@@ -2646,7 +2638,7 @@
 				$rettype = "nodes";
 				$dis = distanceTo($type);
 			}
-		
+
 			if (!isset($_SESSION['jz_cache_'. $type])){
 				$array = $node->getSubNodes($rettype,$dis);
 				for ($ctr=0; $ctr < count($array); $ctr++){
@@ -2657,13 +2649,13 @@
 					$_SESSION['jz_cache_'. $type][$ctr]['path'] = $path;
 					$_SESSION['jz_cache_'. $type][$ctr]['parent'] = $parent->getName();
 				}
-			}		  
+			}
 			$array = $_SESSION['jz_cache_'. $type];
-			
+
 			if ($chosen === false) {
 				$string .= '<option value="" selected>'. word("Please Choose..."). '</option>';
 			}
-		
+
 			for ($ctr=0; $ctr < count($array); $ctr++){
 				$title = $array[$ctr]['title'];
 				if (strlen($array[$ctr]['title']) > $quick_list_truncate + 3) {
@@ -2687,7 +2679,7 @@
 		 * @since 1/12/05
 		 */
 		function openSelect($name, $width = 100,$onchange = false, $return = false) {
-		
+
 		  $retVal  ='<select';
 		  $retVal .= ' class="jz_select"';
 		  $retVal .= ' name=' . $name;
@@ -2696,12 +2688,12 @@
 		    $retVal .= ' onChange="submit()"';
 		  }
 		  $retVal .= '>';
-			
+
 			if ($return){
 				return $retVal;
 			} else {
 				echo $retVal;
-			}	
+			}
 		}
 
 
@@ -2732,17 +2724,15 @@
 		  global $include_path,$jukebox,$my_frontend;
 		  // AJAX:
 		  $ajax_list = array();
-
+		  if ($jukebox == "true") {
+		    include_once($include_path."jukebox/ajax.php");
+		    include_once($include_path."jukebox/ajax_scripts.php");
+		  }
 		  @include_once($include_path."frontend/frontends/${my_frontend}/ajax.php");
 		  @include_once($include_path."frontend/frontends/${my_frontend}/ajax_scripts.php");
 		  @include_once($include_path."frontend/ajax.php");
 		  @include_once($include_path."frontend/ajax_scripts.php");
 
-		  if ($jukebox == "true") {
-		    include_once($include_path."jukebox/ajax.php");
-		    include_once($include_path."jukebox/ajax_scripts.php");
-		  }
-		  
 		  if (sizeof($ajax_list > 0)) { // This frontend has AJAX functions:
 		    global $sajax_debug_mode, $sajax_export_list, $sajax_request_type, $sajax_remote_uri;
 		    $sajax_debug_mode = 0;
@@ -2756,8 +2746,8 @@
 		    echo "\n</script>\n";
 		  }
 		}
-		
-		
+
+
 		/**
 		 * Display the standard javascript
 		 *
@@ -2767,7 +2757,7 @@
 		 */
 		function displayJavascript(){
 			global $root_dir;
-			
+
 			echo returnJavascript();
 		}
 
@@ -2784,8 +2774,8 @@
 		* @since 11/29/04
 		*/
 		function preheader ($title = false, $width = "100%", $align = "left", $js = true, $gzip = true, $cms_open = true, $minimal_theme = false) {
-		  global 	$css, $cms_type, $site_title, $include_path, 
-		  			$root_dir, $node, $live_update, $gzip_handler, 
+		  global 	$css, $cms_type, $site_title, $include_path,
+		  			$root_dir, $node, $live_update, $gzip_handler,
 		  			$jzSERVICES, $skin,$ajax_list,$jukebox,$my_frontend,
 		  			$secure_links;
 
@@ -2793,40 +2783,40 @@
 		  if (($gzip_handler == "true" and $gzip == true) and $cms_type <> "mambo" and $cms_type <> "cpgnuke") {
 		    @ob_start('ob_gzhandler');
 		  }
-		  
+
 		  $fe = new jzFrontend();
 			$display = new jzDisplay();
 			$smarty = smartySetup();
-			
+
 			// Now let's see if we need to open a CMS or not?
 			if ($cms_open) {
 				$jzSERVICES->cmsOpen();
-			}			
+			}
 			$css = $jzSERVICES->cmsCSS();
 
-			$showHeader = false;		
+			$showHeader = false;
 			if (!isset($cms_mode) || $cms_mode === false || $cms_mode == "false") {
 				$showHeader = true;
-				$smarty->assign('favicon', $include_path. 'style/favicon.ico');	
-				$smarty->assign('site_title', $site_title);	
+				$smarty->assign('favicon', $include_path. 'style/favicon.ico');
+				$smarty->assign('site_title', $site_title);
 				if ($title !== false){
 					$smarty->assign('site_title', $site_title. " - ". str_replace("</nobr>","",str_replace("<nobr>","",str_replace("<br>"," ",$title))));
-				}				
-				$smarty->assign('rss_link', $include_path. 'rss.php?type=most-played');	
-			}	
-			$smarty->assign('root_dir', $root_dir);	
-			if (!$minimal_theme) {
-			  $smarty->assign('css', $css);	
+				}
+				$smarty->assign('rss_link', $include_path. 'rss.php?type=most-played');
 			}
-			$smarty->assign('skin', $skin);	
-			$smarty->assign('secure_links', $secure_links);				
-			$smarty->assign('fav_icon', $root_dir . '/style/favicon.ico');	
-			
+			$smarty->assign('root_dir', $root_dir);
+			if (!$minimal_theme) {
+			  $smarty->assign('css', $css);
+			}
+			$smarty->assign('skin', $skin);
+			$smarty->assign('secure_links', $secure_links);
+			$smarty->assign('fav_icon', $root_dir . '/style/favicon.ico');
+
 			// Now let's display the template
 			if ($showHeader){
-				$smarty->display(SMARTY_ROOT. 'templates/slick/header-pre.tpl');	
+				$smarty->display(SMARTY_ROOT. 'templates/slick/header-pre.tpl');
 			}
-			
+
 			// AJAX:
 			$this->handleAJAX();
 
@@ -2840,7 +2830,7 @@
 			include($css);
 			unset($define_only);
 
-			
+
 			//!! Stuff that requires database is safe beyond this point. !!//
 			if ($live_update == "true" && !(isset($_GET['action']) && $_GET['action'] == "search")){
 			  updateNodeCache($node);
@@ -2849,8 +2839,8 @@
 				handlePageView($node);
 			}
 		}
-		
-		
+
+
 		/** Displays a hidden field for the given variable
 		 * if it is currently set via post/get vars, it keeps that value
 		 * or it may be set to the given value.
@@ -2863,7 +2853,7 @@
 		    	$retVal = '<input type="hidden" name="' . htmlentities(jz_encode($type)) . '" value="' . htmlentities(jz_encode($value)) . '">';
 				} else {
 					$retVal = '<input type="hidden" name="' . htmlentities($type) . '" value="' . htmlentities($value) . '">';
-				} 
+				}
 		  } else if (isset($_POST[$type])) {
 		  	if ($encode) {
 					$retVal = '<input type="hidden" name="' . jz_encode($type) . '" value="' . jz_encode($_POST[$type]) . '">';
@@ -2914,7 +2904,7 @@
 						$this->hiddenVariableField(urldecode($t[0]),urldecode($t[1]),false);
 					}
 				}
-								
+
 				if ($return){
 					return $ret;
 				}
@@ -2933,7 +2923,7 @@
 		 **/
 		function embeddedFormHandler($formname = false) {
 		  global $jzUSER, $jzSERVICES;
-		  
+
 		  if ($formname === false) {
 		    $formname = "albumForm";
 		  }
@@ -2944,21 +2934,21 @@
 		}
 
 }
-		
-		
-	     
 
-	
+
+
+
+
 	// EVERYTHING HERE IS OLD AND [HOPEFULLY] NOT NEEDED.
 	// I left it because I didn't want to break anything, since
 	// this is more of a proof of concept than anything else.
-	
-	
+
+
 	// Now let's put in all the standard display functions...
-	
+
 	/**
 	* returns the HTML code for the CMS stylesheet
-	* 
+	*
 	* @author Ross Carlson
 	* @version 04/29/04
 	* @since 04/29/04
@@ -2969,10 +2959,10 @@
 
 		return "<style type=\"text/css\">.jz_row1 { background-color:$bgcolor1; } .jz_row2 { background-color:$bgcolor3; }</style>";
 	}
-			
+
 	/**
 	* returns the HTML code for the stylesheet
-	* 
+	*
 	* @author Ross Carlson
 	* @version 04/29/04
 	* @since 04/29/04
@@ -2980,14 +2970,14 @@
 	*/
 	function returnCSS(){
 		global $css;
-		
+
 		return $css;
 	}
-	
-	
+
+
 	/**
 	* returns the HTML code to close the head
-	* 
+	*
 	* @author Ross Carlson
 	* @version 04/29/04
 	* @since 04/29/04
@@ -2996,10 +2986,10 @@
 	function returnCloseHTMLHead(){
 		return '</head>';
 	}
-	
+
 	/**
 	* returns the HTML code to open the HEAD tag
-	* 
+	*
 	* @author Ross Carlson
 	* @version 04/29/04
 	* @since 04/29/04
@@ -3007,19 +2997,19 @@
 	*/
 	function returnHTMLHead($title){
 		global $root_dir, $site_title;
-		
+
 		$site = $_SERVER["HTTP_HOST"];
 		if ($_SERVER['HTTPS'] == "on"){ $site = "https://". $site; } else { $site = "http://". $site; }
-		
+
 		return '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head><link rel="shortcut icon" href="'. $root_dir. '/style/favicon.ico">'. "\n".
 			   '<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>'.  "\n".
 			   $site_title. " - ". str_replace("</nobr>","",str_replace("<nobr>","",str_replace("<br>"," ",$title))). "</title>". "\n".
 			   '<link rel="alternate" type="application/rss+xml" title="Jinzora Most Played" href="'. $root_dir. '/rss.php?type=most-played">'. "\n";
 	}
-	
+
 	/**
 	* returns the HTML code for the Javascript includes
-	* 
+	*
 	* @author Ross Carlson
 	* @version 04/29/04
 	* @since 04/29/04
@@ -3027,23 +3017,23 @@
 	*/
 	function returnJavascript(){
 		global $root_dir, $enable_ratings;
-		
+
 		$js = '<script type="text/javascript" src="'. $root_dir. '/lib/jinzora.js"></script>'.
 			   '<script type="text/javascript" src="'. $root_dir. '/lib/overlib.js"></script>'.
 			   '<div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"></div>'.
 			   '<script type="text/javascript" src="'. $root_dir. '/lib/jquery/jquery.js"></script>';
-			   
+
 		if ($enable_ratings == "true") {
 			$js .= 	'<script type="text/javascript" src="'. $root_dir. '/lib/jquery/rater.js"></script>'.
 				    '<link rel="stylesheet" type="text/css" href="'. $root_dir. '/lib/jquery/rater/rater.css.php" />';
 		}
-		
+
 		return $js;
 	}
-		
+
 	/**
 	* returns the HTML code to block right clicking
-	* 
+	*
 	* @author Ross Carlson
 	* @version 04/29/04
 	* @since 04/29/04
@@ -3051,23 +3041,23 @@
 	*/
 	function displaySecureLinks(){
 		global $secure_links;
-		
+
 		if ($secure_links == "true"){
 			$retVal = '<SCRIPT LANGUAGE="JavaScript1.1">'. "\n";
 			$retVal .= 'function noContext(){return false;}'. "\n";
 			$retVal .= 'document.oncontextmenu = noContext;'. "\n";
 			$retVal .= '// -->'. "\n";
 			$retVal .= '</script>'. "\n";
-			
+
 			return $retVal;
 		 } else {
 		 	return false;
 		 }
 	}
-	
+
 	/**
 	* returns the HTML for a drop down list of any type.
-	* 
+	*
 	* @author Ben Dodson, Ross Carlson
 	* @version 6/9/04
 	* @since 6/9/04
@@ -3078,12 +3068,12 @@
 	* @param $path Restraining path (defaults to empty). Can be string or array.
 	*/
 	// TODO:
-	// 1) Test this; where is it being called from? 
+	// 1) Test this; where is it being called from?
 	//    Why is /display.php's functions still being called?
-	
+
 	function returnSelect($onclick, $boxname, $width, $type = "genre", $node = false){
 		global $hierarchy, $quick_list_truncate;
-		
+
 		if ($node === false) {
 			$node = &new jzMediaNode();
 		}
@@ -3096,13 +3086,13 @@
 					$rettype = "nodes";
 				}
 				$array = $node->getSubNodes($rettype,$i - $node->getLevel(),false,0);
-				
+
 				if ($onclick){
 					$retVal = '<select name="'. $boxname. '" onChange="submit()" class="jz_select" style="width: '. $width. 'px;">'. "\n";
 				} else {
 					$retVal = '<select name="'. $boxname. '" class="jz_select" style="width: '. $width. 'px;">'. "\n";
 				}
-				
+
 				$retVal .= '<option value="" selected>'. word("Please Choose..."). '</option>';
 				for ($ctr=0; $ctr < count($array); $ctr++){
 					$fulltitle = $array[$ctr]->getName();
@@ -3114,16 +3104,16 @@
 				}
 				$retVal .= '</select>'. "\n";
 				return $retVal;
-				
+
 			}
 		}
 		return;
 	}
 
-	
+
 	/**
 	* returns the HTML for the drop down list of Albums
-	* 
+	*
 	* @author Ross Carlson
 	* @version 6/9/04
 	* @since 04/29/04
@@ -3136,10 +3126,10 @@
 	function returnAlbumSelect($onclick, $boxname, $width){
 		return returnSelect($onclick,$boxname,$width,"album");
 	}
-	
+
 	/**
 	* returns the HTML for the drop down list of Artists
-	* 
+	*
 	* @author Ross Carlson
 	* @version 04/29/04
 	* @since 04/29/04
@@ -3154,7 +3144,7 @@
 
 	/**
 	* returns the HTML for the drop down list of Genres
-	* 
+	*
 	* @author Ross Carlson
 	* @version 04/29/04
 	* @since 04/29/04
@@ -3165,7 +3155,7 @@
 	function returnGenreSelect($onclick, $boxname, $width){
 		return returnSelect($onclick,$boxname,$width,"genre");
 	}
-	
+
 	/* This function displays the login page then authenticaes the user for admin level access */
 	function displayLogin(){
 		global $main_table_width, $cellspacing, $this_page, $url_seperator;
@@ -3173,7 +3163,7 @@
 		// Let's show the header
 		displayHeader(word("Login"));
 		$formAction = $this_page;
-		?>		
+		?>
 			<form action="<?php echo $formAction; ?>" method="post">
 				<input type="hidden" name="returnPage" value="<?php echo $_GET['return']; ?>">
 				<table width="<?php echo $main_table_width; ?>%" cellpadding="<?php echo $cellspacing; ?>" cellspacing="0" border="0">
@@ -3199,7 +3189,7 @@
 					</tr>
 					<tr>
 						<td width="50%" align="right">
-							
+
 						</td>
 						<td width="50%">
 							<font size="2">

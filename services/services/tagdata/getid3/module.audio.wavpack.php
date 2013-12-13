@@ -30,12 +30,10 @@ class getid3_wavpack
 			} elseif (feof($fd)) {
 				break;
 			} elseif (
-				isset($ThisFileInfo['wavpack']['blockheader']['total_samples']) &&
-				isset($ThisFileInfo['wavpack']['blockheader']['block_samples']) &&
-				($ThisFileInfo['wavpack']['blockheader']['total_samples'] > 0) &&
-				($ThisFileInfo['wavpack']['blockheader']['block_samples'] > 0) &&
+				(@$ThisFileInfo['wavpack']['blockheader']['total_samples'] > 0) &&
+				(@$ThisFileInfo['wavpack']['blockheader']['block_samples'] > 0) &&
 				(!isset($ThisFileInfo['wavpack']['riff_trailer_size']) || ($ThisFileInfo['wavpack']['riff_trailer_size'] <= 0)) &&
-				((isset($ThisFileInfo['wavpack']['config_flags']['md5_checksum']) && ($ThisFileInfo['wavpack']['config_flags']['md5_checksum'] === false)) || !empty($ThisFileInfo['md5_data_source']))) {
+				((@$ThisFileInfo['wavpack']['config_flags']['md5_checksum'] === false) || !empty($ThisFileInfo['md5_data_source']))) {
 					break;
 			}
 
@@ -45,24 +43,17 @@ class getid3_wavpack
 
 			if ($blockheader_magic != 'wvpk') {
 				$ThisFileInfo['error'][] = 'Expecting "wvpk" at offset '.$blockheader_offset.', found "'.$blockheader_magic.'"';
-				switch (isset($ThisFileInfo['audio']['dataformat']) ? $ThisFileInfo['audio']['dataformat'] : '') {
-					case 'wavpack':
-					case 'wvc':
-						break;
-					default:
-						unset($ThisFileInfo['fileformat']);
-						unset($ThisFileInfo['audio']);
-						unset($ThisFileInfo['wavpack']);
-						break;
+				if ((@$ThisFileInfo['audio']['dataformat'] != 'wavpack') && (@$ThisFileInfo['audio']['dataformat'] != 'wvc')) {
+					unset($ThisFileInfo['fileformat']);
+					unset($ThisFileInfo['audio']);
+					unset($ThisFileInfo['wavpack']);
 				}
 				return false;
 			}
 
 
-			if (empty($ThisFileInfo['wavpack']['blockheader']['block_samples']) ||
-				empty($ThisFileInfo['wavpack']['blockheader']['total_samples']) ||
-				($ThisFileInfo['wavpack']['blockheader']['block_samples'] <= 0) ||
-				($ThisFileInfo['wavpack']['blockheader']['total_samples'] <= 0)) {
+			if ((@$ThisFileInfo['wavpack']['blockheader']['block_samples'] <= 0) ||
+				(@$ThisFileInfo['wavpack']['blockheader']['total_samples'] <= 0)) {
 				// Also, it is possible that the first block might not have
 				// any samples (block_samples == 0) and in this case you should skip blocks
 				// until you find one with samples because the other information (like
@@ -85,15 +76,10 @@ class getid3_wavpack
 
 				if ($ThisFileInfo['wavpack']['blockheader']['size'] >= 0x100000) {
 					$ThisFileInfo['error'][] = 'Expecting WavPack block size less than "0x100000", found "'.$ThisFileInfo['wavpack']['blockheader']['size'].'" at offset '.$ThisFileInfo['wavpack']['blockheader']['offset'];
-					switch (isset($ThisFileInfo['audio']['dataformat']) ? $ThisFileInfo['audio']['dataformat'] : '') {
-						case 'wavpack':
-						case 'wvc':
-							break;
-						default:
-							unset($ThisFileInfo['fileformat']);
-							unset($ThisFileInfo['audio']);
-							unset($ThisFileInfo['wavpack']);
-							break;
+					if ((@$ThisFileInfo['audio']['dataformat'] != 'wavpack') && (@$ThisFileInfo['audio']['dataformat'] != 'wvc')) {
+						unset($ThisFileInfo['fileformat']);
+						unset($ThisFileInfo['audio']);
+						unset($ThisFileInfo['wavpack']);
 					}
 					return false;
 				}
@@ -105,15 +91,10 @@ class getid3_wavpack
 					(($ThisFileInfo['wavpack']['blockheader']['minor_version'] < 4) &&
 					($ThisFileInfo['wavpack']['blockheader']['minor_version'] > 16))) {
 						$ThisFileInfo['error'][] = 'Expecting WavPack version between "4.2" and "4.16", found version "'.$ThisFileInfo['wavpack']['blockheader']['major_version'].'.'.$ThisFileInfo['wavpack']['blockheader']['minor_version'].'" at offset '.$ThisFileInfo['wavpack']['blockheader']['offset'];
-						switch (isset($ThisFileInfo['audio']['dataformat']) ? $ThisFileInfo['audio']['dataformat'] : '') {
-							case 'wavpack':
-							case 'wvc':
-								break;
-							default:
-								unset($ThisFileInfo['fileformat']);
-								unset($ThisFileInfo['audio']);
-								unset($ThisFileInfo['wavpack']);
-								break;
+						if ((@$ThisFileInfo['audio']['dataformat'] != 'wavpack') && (@$ThisFileInfo['audio']['dataformat'] != 'wvc')) {
+							unset($ThisFileInfo['fileformat']);
+							unset($ThisFileInfo['audio']);
+							unset($ThisFileInfo['wavpack']);
 						}
 						return false;
 				}
@@ -283,24 +264,24 @@ class getid3_wavpack
 							$ThisFileInfo['wavpack']['config_flags'] = $metablock['flags'];
 
 
-							$ThisFileInfo['audio']['encoder_options'] = '';
 							if ($ThisFileInfo['wavpack']['blockheader']['flags']['hybrid']) {
-								$ThisFileInfo['audio']['encoder_options'] .= ' -b???';
+								@$ThisFileInfo['audio']['encoder_options'] .= ' -b???';
 							}
-							$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['adobe_mode']     ? ' -a' : '');
-							$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['optimize_wvc']   ? ' -cc' : '');
-							$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['create_exe']     ? ' -e' : '');
-							$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['fast_flag']      ? ' -f' : '');
-							$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['joint_override'] ? ' -j?' : '');
-							$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['high_flag']      ? ' -h' : '');
-							$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['md5_checksum']   ? ' -m' : '');
-							$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['calc_noise']     ? ' -n' : '');
-							$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['shape_override'] ? ' -s?' : '');
-							$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['extra_mode']     ? ' -x?' : '');
-							if (!empty($ThisFileInfo['audio']['encoder_options'])) {
-								$ThisFileInfo['audio']['encoder_options'] = trim($ThisFileInfo['audio']['encoder_options']);
-							} elseif (isset($ThisFileInfo['audio']['encoder_options'])) {
-								unset($ThisFileInfo['audio']['encoder_options']);
+							@$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['adobe_mode']     ? ' -a' : '');
+							@$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['optimize_wvc']   ? ' -cc' : '');
+							@$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['create_exe']     ? ' -e' : '');
+							@$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['fast_flag']      ? ' -f' : '');
+							@$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['joint_override'] ? ' -j?' : '');
+							@$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['high_flag']      ? ' -h' : '');
+							@$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['md5_checksum']   ? ' -m' : '');
+							@$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['calc_noise']     ? ' -n' : '');
+							@$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['shape_override'] ? ' -s?' : '');
+							@$ThisFileInfo['audio']['encoder_options'] .= ($metablock['flags']['extra_mode']     ? ' -x?' : '');
+							if (@$ThisFileInfo['audio']['encoder_options']) {
+							    $ThisFileInfo['audio']['encoder_options'] = trim(@$ThisFileInfo['audio']['encoder_options']);
+							}
+							elseif (isset($ThisFileInfo['audio']['encoder_options'])) {
+							    unset($ThisFileInfo['audio']['encoder_options']);
 							}
 							break;
 
@@ -345,7 +326,7 @@ class getid3_wavpack
 		$ThisFileInfo['audio']['bits_per_sample'] = $ThisFileInfo['wavpack']['blockheader']['flags']['bytes_per_sample'] * 8;
 		$ThisFileInfo['audio']['channels']        = ($ThisFileInfo['wavpack']['blockheader']['flags']['mono'] ? 1 : 2);
 
-		if (!empty($ThisFileInfo['playtime_seconds'])) {
+		if (@$ThisFileInfo['playtime_seconds']) {
 
 			$ThisFileInfo['audio']['bitrate']     = (($ThisFileInfo['avdataend'] - $ThisFileInfo['avdataoffset']) * 8) / $ThisFileInfo['playtime_seconds'];
 
@@ -382,7 +363,7 @@ class getid3_wavpack
 			0x25 => 'Config Block',
 			0x26 => 'MD5 Checksum',
 		);
-		return (isset($WavPackMetablockNameLookup[$id]) ? $WavPackMetablockNameLookup[$id] : '');
+		return (@$WavPackMetablockNameLookup[$id]);
 	}
 
 }

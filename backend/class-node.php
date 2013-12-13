@@ -110,7 +110,7 @@
 		* @version 6/4/04
 		* @since 6/4/04
 		*/
-		function getSubNodes($type='nodes',$distance=false, $random=false, $limit=0, $hasArt = false, $offset=false) {
+		function getSubNodes($type='nodes',$distance=false, $random=false, $limit=0, $hasArt = false) {
 		
 		  if ($distance === false) {
 		    $distance = $this->getNaturalDepth();	
@@ -1242,12 +1242,6 @@
 					$res->setMeta($meta,"cache");
 					$res->playpath =  $filename;
 				}
-			}
-			else if (is_array($meta) && sizeof($meta) > 0) {
-			  // Update the meta data even if file is already in cache
-			  $track = &new jzMediaTrack($mpath);
-			  $track->playpath = $filename;
-			  $track->setMeta($meta,"cache");
 			}
 			return $res;
 		}

@@ -117,7 +117,7 @@
 		}
 		
 		function _constructor($login, $uid) {
-		  global $include_path, $http_auth_enable;
+		  global $include_path;
 			
 		  if ($login === false) {
 		    $be = &new jzBackend();
@@ -130,11 +130,7 @@
 		  }
 
 			$be = &new jzBackend();
-			if (isset($http_auth_enable) && $http_auth_enable == "true") {
-				$this->data_dir = $be->data_dir;
-				$this->setHTTPAuthUser();
-				$this->loadSettings();
-			} else if (isset($_SESSION['jzUserID'])) {
+			if (isset($_SESSION['jzUserID'])) {
 				$this->id = jz_cookie_decode($_SESSION['jzUserID']);
 				$this->data_dir = $be->data_dir;
 				$this->loadSettings();
@@ -147,8 +143,9 @@
 				$this->data_dir = $be->data_dir;
 				$this->settings = false;
 				if (($this->id = $this->lookupUID('NOBODY')) === false) {
-				  $this->id = $this->addUser('NOBODY',"");
+				  $this->addUser('NOBODY',"");
 				}
+				$this->name = 'NOBODY';
 				$this->loadSettings();
 			}
 			// Give them a session playlist, too.
@@ -203,11 +200,8 @@
 			  return false;
 			}
 			$users = unserialize($f);
-			if (isset($users[$user]) && is_array($users[$user])
-			    && isset($users[$user]['id'])) {
-			  return $users[$user]['id'];
-			}
-			return false;
+			
+			return (isset($users[$user]['id'])) ? $users[$user]['id'] : false;
 		}
 		
 
@@ -279,11 +273,8 @@
 				$users[$user]['password'] = jz_password($password);
 				$users[$user]['id'] = $my_id = uniqid("USR");
 			}
-			writeLogData("access", "Adding user '".$user."'");
 			$settings = array();
-			if ($user != NOBODY) {
-			  $settings['name'] = $user;
-			}
+			$settings['name'] = $user;
 			$this->setSettings($settings,$my_id);
 			
 			if (!$handle = @fopen($dp,"w")) {
@@ -520,7 +511,7 @@
 		 * @author Ben Dodson
 		 * @param $setting the setting to retrieve.
 		 */
-		function getSetting($setting, $recursive = false) {
+		function getSetting($setting) {
 		  global $USER_SETTINGS_OVERRIDE;
 		  // some overrides:
 		  if ($setting == "theme" && isset($_SESSION['theme'])) {
@@ -541,11 +532,10 @@
 		    }
 		    if (isset($this->settings[$setting])) return $this->settings[$setting];
 		    else return user_default($setting);
-		  } else if ($recursive == true) {
-		    return user_default($setting);
-		  } else {
-		    $this->loadSettings();
-		    return $this->getSetting($setting, true);
+		  }
+		  else {
+		    $this->loadSettings(); echo 'here';
+		    return $this->getSetting($setting);
 		  }
 		}
 		
@@ -568,15 +558,7 @@
 				$settings = $s[$id];
 				// Is the login invalid?		
 				if (!is_array($settings) || $settings == array()) {
-				  // fetch NOBODY's details
-				  $nobody = $this->lookupUID(NOBODY);
-				  if ($nobody != false) {
-				    $settings = $s[$nobody];
-				  }
-				  if (!is_array($settings)) {
-				    $settings = array();
-				  }
-				  $s[$id] = $settings;
+				  return $this->loadSettings($this->lookupUID(NOBODY));
 				}
 
 				if (isset($settings['template']) && $settings['template'] != "") {
@@ -638,9 +620,8 @@
 		 * @author Ben Dodson
 		 * @param $settingsArray an associative array of keys/values
 		 */
-		function setSettings($settingsArray, $my_id = false, $wipe = false) {
-			if ($my_id === false) $id = $this->id;
-			else $id = $my_id;
+		function setSettings($settingsArray, $id = false, $wipe = false) {
+			if ($id === false) $id = $this->id;
 		
 			if (!$wipe) {
 				$oldsettings = $this->loadSettings($id);
@@ -677,7 +658,7 @@
 			  } else {
 			    $oldsettings[$key] = $val;
 			  }
-			  if (isset($this->settings) && $my_id === false) {
+			  if (isset($this->settings)) {
 			    $this->settings[$key] = $oldsettings[$key];
 			  }
 			}
@@ -888,50 +869,6 @@
 	    		}
 	 		 }
 	 		 return false;
-		}
-
-		function setHTTPAuthUser() {
-		  global $http_auth_anon_name, $http_auth_auto_create, $http_auth_newuser_template;
-		  
-		  if (isset($_SERVER['REMOTE_USER'])) {
-		    $username = $_SERVER['REMOTE_USER'];
-		  } else {
-		    $username = NOBODY;
-		  }
-		  
-		  if (isset($http_auth_anon_name) && $username == $http_auth_anon_name) {
-		    $username = NOBODY;
-		  }
-		  
-		  if (($this->id = $this->lookupUID($username)) != false) {
-		    return;
-		  }
-		  
-		  if (isset($http_auth_auto_create) && $http_auth_auto_create == "true" && $username != NOBODY) {
-		    // auto-create the user w/ random password
-		    $this->id = $this->addUser($username,uniqid('P'));
-		  }
-		  
-		  if($this->id != false) {
-		    writeLogData("access", "created user entry for user '".$username."'");
-		    if (isset($http_auth_newuser_template) && $http_auth_newuser_template != "") {
-		      $be = new jzBackend();
-		      $classes = $be->loadData('userclasses');
-		      if(isset($classes[$http_auth_newuser_template])) {
-			$settings = array();
-			$settings['template'] = $http_auth_newuser_template;
-			$this->setSettings($settings, $this->id, true);
-		      }
-		    }
-		    
-		    return;
-		  }
-		  
-		  // convert user to nobody
-		  if (($this->id = $this->lookupUID(NOBODY)) === false) {
-		    // create NOBODY
-		    $this->id = $this->addUser(NOBODY,"");
-		  }
 		}
 	}
 	

@@ -28,10 +28,8 @@ class getid3_write_real
 	function WriteReal() {
 		// File MUST be writeable - CHMOD(646) at least
 		if (is_writeable($this->filename)) {
-			ob_start();
-			if ($fp_source = fopen($this->filename, 'r+b')) {
+			if ($fp_source = @fopen($this->filename, 'r+b')) {
 
-				ob_end_clean();
 				// Initialize getID3 engine
 				$getID3 = new getID3;
 				$OldThisFileInfo = $getID3->analyze($this->filename);
@@ -57,7 +55,7 @@ class getid3_write_real
 				$new_PROP_tag_data = $this->GeneratePROPchunk($OldThisFileInfo['real']['chunks'], $new_CONT_tag_data);
 				$new__RMF_tag_data = $this->GenerateRMFchunk($OldThisFileInfo['real']['chunks']);
 
-				if (isset($oldChunkInfo['.RMF']['length']) && ($oldChunkInfo['.RMF']['length'] == strlen($new__RMF_tag_data))) {
+				if (@$oldChunkInfo['.RMF']['length'] == strlen($new__RMF_tag_data)) {
 					fseek($fp_source, $oldChunkInfo['.RMF']['offset'], SEEK_SET);
 					fwrite($fp_source, $new__RMF_tag_data);
 				} else {
@@ -66,7 +64,7 @@ class getid3_write_real
 					return false;
 				}
 
-				if (isset($oldChunkInfo['PROP']['length']) && ($oldChunkInfo['PROP']['length'] == strlen($new_PROP_tag_data))) {
+				if (@$oldChunkInfo['PROP']['length'] == strlen($new_PROP_tag_data)) {
 					fseek($fp_source, $oldChunkInfo['PROP']['offset'], SEEK_SET);
 					fwrite($fp_source, $new_PROP_tag_data);
 				} else {
@@ -75,7 +73,7 @@ class getid3_write_real
 					return false;
 				}
 
-				if (isset($oldChunkInfo['CONT']['length']) && ($oldChunkInfo['CONT']['length'] == strlen($new_CONT_tag_data))) {
+				if (@$oldChunkInfo['CONT']['length'] == strlen($new_CONT_tag_data)) {
 
 					// new data length is same as old data length - just overwrite
 					fseek($fp_source, $oldChunkInfo['CONT']['offset'], SEEK_SET);
@@ -94,7 +92,7 @@ class getid3_write_real
 						$BeforeOffset = $oldChunkInfo['CONT']['offset'];
 						$AfterOffset  = $oldChunkInfo['CONT']['offset'] + $oldChunkInfo['CONT']['length'];
 					}
-					if ($tempfilename = tempnam(GETID3_TEMP_DIR, 'getID3')) {
+					if ($tempfilename = tempnam('*', 'getID3')) {
 						ob_start();
 						if ($fp_temp = fopen($tempfilename, 'wb')) {
 
@@ -129,8 +127,6 @@ class getid3_write_real
 
 
 			} else {
-				$errormessage = ob_get_contents();
-				ob_end_clean();
 				$this->errors[] = 'Could not open '.$this->filename.' mode "r+b"';
 				return false;
 			}
@@ -202,17 +198,17 @@ class getid3_write_real
 
 		$CONTchunk  = "\x00\x00"; // object version
 
-		$CONTchunk .= getid3_lib::BigEndian2String((!empty($this->tag_data['title'])     ? strlen($this->tag_data['title'])     : 0), 2);
-		$CONTchunk .= (!empty($this->tag_data['title'])     ? strlen($this->tag_data['title'])     : '');
+		$CONTchunk .= getid3_lib::BigEndian2String(strlen(@$this->tag_data['title']), 2);
+		$CONTchunk .= @$this->tag_data['title'];
 
-		$CONTchunk .= getid3_lib::BigEndian2String((!empty($this->tag_data['artist'])    ? strlen($this->tag_data['artist'])    : 0), 2);
-		$CONTchunk .= (!empty($this->tag_data['artist'])    ? strlen($this->tag_data['artist'])    : '');
+		$CONTchunk .= getid3_lib::BigEndian2String(strlen(@$this->tag_data['artist']), 2);
+		$CONTchunk .= @$this->tag_data['artist'];
 
-		$CONTchunk .= getid3_lib::BigEndian2String((!empty($this->tag_data['copyright']) ? strlen($this->tag_data['copyright']) : 0), 2);
-		$CONTchunk .= (!empty($this->tag_data['copyright']) ? strlen($this->tag_data['copyright']) : '');
+		$CONTchunk .= getid3_lib::BigEndian2String(strlen(@$this->tag_data['copyright']), 2);
+		$CONTchunk .= @$this->tag_data['copyright'];
 
-		$CONTchunk .= getid3_lib::BigEndian2String((!empty($this->tag_data['comment'])   ? strlen($this->tag_data['comment'])   : 0), 2);
-		$CONTchunk .= (!empty($this->tag_data['comment'])   ? strlen($this->tag_data['comment'])   : '');
+		$CONTchunk .= getid3_lib::BigEndian2String(strlen(@$this->tag_data['comment']), 2);
+		$CONTchunk .= @$this->tag_data['comment'];
 
 		if ($this->paddedlength > (strlen($CONTchunk) + 8)) {
 			$CONTchunk .= str_repeat("\x00", $this->paddedlength - strlen($CONTchunk) - 8);
@@ -226,10 +222,8 @@ class getid3_write_real
 	function RemoveReal() {
 		// File MUST be writeable - CHMOD(646) at least
 		if (is_writeable($this->filename)) {
-			ob_start();
-			if ($fp_source = fopen($this->filename, 'r+b')) {
+			if ($fp_source = @fopen($this->filename, 'r+b')) {
 
-				ob_end_clean();
 				// Initialize getID3 engine
 				$getID3 = new getID3;
 				$OldThisFileInfo = $getID3->analyze($this->filename);
@@ -256,7 +250,7 @@ class getid3_write_real
 
 				$BeforeOffset = $oldChunkInfo['CONT']['offset'];
 				$AfterOffset  = $oldChunkInfo['CONT']['offset'] + $oldChunkInfo['CONT']['length'];
-				if ($tempfilename = tempnam(GETID3_TEMP_DIR, 'getID3')) {
+				if ($tempfilename = tempnam('*', 'getID3')) {
 					ob_start();
 					if ($fp_temp = fopen($tempfilename, 'wb')) {
 
@@ -288,8 +282,6 @@ class getid3_write_real
 
 
 			} else {
-				$errormessage = ob_get_contents();
-				ob_end_clean();
 				$this->errors[] = 'Could not open '.$this->filename.' mode "r+b"';
 				return false;
 			}

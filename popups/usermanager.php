@@ -1,5 +1,5 @@
 <?php if (!defined(JZ_SECURE_ACCESS)) die ('Security breach detected.');
-global $resampleRates, $frontend, $jinzora_skin, $include_path, $jzUSER, $jzSERVICES, $cms_mode, $http_auth_enable;
+global $resampleRates, $frontend, $jinzora_skin, $include_path, $jzUSER, $jzSERVICES, $cms_mode;
 
 $display = new jzDisplay();
 $be = new jzBackend();
@@ -128,17 +128,10 @@ if ($_GET['subaction'] == "handleuser") {
 			} 
 		}
 		if (!isset($myid)) {
-		  // okay, yes,  this is the worst piece of code in Jinzora.
-		  $myid = $jzUSER->lookupUID(NOBODY);
-		}
-		if($myid == false) {
-		  // need to add NOBODY
-		  $myid = $jzUSER->addUser(NOBODY, "");
-		  if($myid == false) {
-		    echo word("Could not add user") . " " . word('Anonymous') . ".";
-		    return;
-		  }
-		}
+        	// okay, yes,  this is the worst piece of code in Jinzora.
+            $myid = $jzUSER->lookupUID(NOBODY);
+        }
+		
 		if ($_POST['field1'] != "jznoupd") {
 			// update password
 			$jzUSER->changePassword($_POST['field1'], $jzUSER->lookupName($myid));
@@ -149,7 +142,20 @@ if ($_GET['subaction'] == "handleuser") {
 		}
 	}
 	$wipe = false;
-	if ($_POST['templatetype'] == "sticky") {
+	// DETACH
+	if ($_POST['templatetype'] == "detach") {
+		if ($_POST['userclass'] == "jznewtemplate") {
+			echo "Cannot base a user only on a blank template.";
+			return;
+		} else {
+			$classes = $be->loadData('userclasses');
+			$settings = $classes[$_POST['userclass']];
+			$settings['template'] = "";
+			$wipe = true;
+		}
+		// STICKY
+	} else
+		if ($_POST['templatetype'] == "sticky") {
 			if ($_POST['userclass'] == "jznewtemplate") {
 				echo "Cannot stick user to a blank template.";
 				return;
@@ -159,7 +165,7 @@ if ($_GET['subaction'] == "handleuser") {
 				$wipe = true;
 			}
 			// CUSTOMIZE
-	} else {
+		} else
 			if ($_POST['templatetype'] == "customize") {
 				$settings = userPullSettings();
 				$settings['template'] = "";
@@ -167,9 +173,8 @@ if ($_GET['subaction'] == "handleuser") {
 				echo "Sorry, I don't know how to manage the user.";
 				return;
 			}
-	}
 
-	$un = ($_POST['username'] != NOBODY) ? $_POST['username'] : word('Anonymous');
+	$un = ($_POST['username'] != "") ? $_POST['username'] : word('anonymous');
 	if (isset($settings['home_dir'])) {
 		$settings['home_dir'] = str_replace('USERNAME', $un, $settings['home_dir']);
 	}
@@ -363,16 +368,7 @@ if ($_GET['subaction'] == "registration") {
 // * * * * * * * * //
 if ($_GET['subaction'] == "default_access") {
 	$_GET['subaction'] = "edituser";
-	$myid = $jzUSER->lookupUID(NOBODY);
-	if ($myid == "" || $myid == false) {
-	  // need to add NOBODY
-	  $myid = $jzUSER->addUser(NOBODY, "");
-	  if ($myid == false) {
-	    echo word("Could not add user") . " " . word('Anonymous') . ".";
-	    return;
-	  }
-	}
-	$_POST['user_to_edit'] = $myid;
+	$_POST['user_to_edit'] = $jzUSER->lookupUID(NOBODY);
 }
 
 // * * * * * * * * //
@@ -457,15 +453,6 @@ if (!isset ($_POST['user_to_edit'])) {
 	}
 }
 
-if (isset($http_auth_enable) && $http_auth_enable == "true") {
-  $edit_pwd = false;  
-} else if ($cms_mode == "false") {
-  $edit_pwd = true;
-} else {
-  $edit_pwd = false;
-}
-
-
 $jzUSER2 = new jzUser(false, $mid);
 
 if ($_GET['subaction'] == "adduser") {
@@ -504,7 +491,7 @@ if ($_GET['subaction'] == "adduser") {
 }
 ?>
 			 </td>
-			 </tr><?php if ($edit_pwd == true) { ?>
+			 </tr><?php if ($cms_mode == "false") { ?>
 			 <tr>
 			 <td width="30%" valign="top" align="right">
 			 <?php echo word("Password"); ?>:
@@ -527,9 +514,7 @@ if ($_GET['subaction'] == "adduser") {
 }
 ?>
 			 </td>
-			 </tr><?php } else { ?>
-			   <input type="hidden" name="field1" value="jznoupd">
-			   <input type="hidden" name="field2" value="jznoupd"> <?php } ?>
+			 </tr><?php } else { ?> <input type="hidden" name="field1" value="jznoupd"> <?php } ?>
 			 <tr>
 			 <td width="30%" valign="top" align="right">
 			 <?php echo word("Full Name"); ?>:
@@ -548,11 +533,10 @@ if ($_GET['subaction'] == "adduser") {
 			 </tr>
 			 <?php
 
-} else { ?>
-<input type="hidden" name="field1" value="jznoupd">
-<input type="hidden" name="field2" value="jznoupd">
-<input type="hidden" name="username" value="<?php echo NOBODY; ?>">
-<?php } ?>
+}
+?>
+
+
 			 <tr>
 			    <td width-"30%" valign="top" align="right">
 			    <?php echo word("Template:"); ?>
@@ -560,24 +544,17 @@ if ($_GET['subaction'] == "adduser") {
 			    <td width="70%">
 						<?php
 
+echo '<select name="userclass" class="jz_select">';
+echo "<option value=\"jznewtemplate\">" . word('Blank Template');
 $classes = $be->loadData('userclasses');
-$t = 'jznewtemplate';
 if (is_array($classes)) {
+	$keys = array_keys($classes);
 	$set = $jzUSER2->loadSettings();
 	if (isset ($set['template'])) {
 		$t = $set['template'];
+	} else {
+		$t = $keys[0];
 	}
-}
-echo '<select name="userclass" class="jz_select">';
-if ($t == 'jznewtemplate') {
-  echo "<option value=\"jznewtemplate\" SELECTED>";
-}
-else {
-  echo "<option value=\"jznewtemplate\">";
-}
-echo word('Blank Template');
-if (is_array($classes)) {
-	$keys = array_keys($classes);
 	foreach ($keys as $key) {
 		echo "<option value=\"$key\"";
 		if ($key == $t) {
@@ -590,10 +567,13 @@ if (is_array($classes)) {
 		      </select>
 			  </td></tr>
 			  <tr><td width="30%" valign="top" align="right"><?php echo word('Management:'); ?></td><td>
-		          <input type="radio" name="templatetype" value="sticky"<?php if ($jzUSER2->getSetting('template')) echo " checked>"; else echo ">"; echo word('Update user when template is updated'); ?>
+		          <input type="radio" name="templatetype" value="sticky"><?php echo word('Update user when template is updated'); ?>
 			  </td></tr>
 			  <tr><td></td><td>
-			  <input type="radio" name="templatetype" value="customize"<?php if ($jzUSER2->getSetting('template')) echo ">"; else echo " checked>"; echo word("Customize this user's settings"); ?>
+		          <!--<input type="radio" name="templatetype" value="detach"><?php echo word('Detach user from template'); ?>
+			  </td></tr>
+			  <tr><td></td><td>-->
+			  <input type="radio" name="templatetype" value="customize" checked><?php echo word("Customize this user's settings"); ?>
 			  </td></tr>
 			  <tr>
 			  <td width="30%" valign="top">
@@ -974,9 +954,8 @@ $this->closeBlock();
 								$retArray = readDirInfo($include_path. "services/services/players","file");
 								sort($retArray);
 								for($i=0;$i<count($retArray);$i++){
-									if (stripos(strrev($retArray[$i]),"php.") !== 0) {continue;}
+									if (!stristr($retArray[$i],".php") and !stristr($retArray[$i],"qt.")){continue;}
 									$val = substr($retArray[$i],0,-4);
-									if ($val == "qt") {continue;}
 									echo '<option value="'. $val. '"';
 									if ($settings['player'] == $val) {
 									  echo ' selected';

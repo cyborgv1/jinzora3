@@ -30,6 +30,7 @@
 	}
 	sortElements($retArray,"name");
 	
+//	$args = func_get_args();
 	if (isset($_GET['jz_letter'])) {
 		$letter = $_GET['jz_letter'];
 	} else {
@@ -111,14 +112,7 @@
 									$shortTitle .= ")";
 									$title .= ")";
 								}
-								$linkSub = $retArray[$e];
-								if ($subCountN == 1) {
-								  $mysubs = $linkSub->getSubNodes();
-								  if (! $mysubs[0]->isLeaf()) {
-								    $linkSub = $mysubs[0];
-								  }
-								}
-								$display->link($linkSub, $shortTitle, word("Browse: "). $title);	
+								$display->link($retArray[$e], $shortTitle, word("Browse: "). $title);						
 								
 								// Let's see if this is new or not
 								if ($days = $retArray[$e]->newSince($days_for_new)){

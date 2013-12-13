@@ -556,7 +556,7 @@
 		* @version 6/4/04
 		* @since 6/4/04
 		*/
-		function getMainArt($dimensions = false, $createBlank = true, $imageType = "audio", $cacheOnly = false) {
+		function getMainArt($dimensions = false, $createBlank = true, $imageType = "audio") {
 			global $jzSERVICES;
 
 			if (isset($this->artpath) && ($this->artpath !== false)) {
@@ -584,7 +584,6 @@
 			
 			if ($dimensions && $artpath != "-"){
 				// Now lets check or create or image and return the resized one
-				
 				$retVal = $jzSERVICES->resizeImage($artpath, $dimensions, false, $imageType);
 				if ($retVal){
 					return $retVal;

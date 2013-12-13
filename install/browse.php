@@ -1,7 +1,7 @@
-<?php 
+<?php
 	// Let's allow access
 	define('JZ_SECURE_ACCESS','true');
-	
+
 	// Now what is the form info?
 	$prefix = "";
 	$media_path_val = "media_path";
@@ -30,9 +30,9 @@ function backData(){
 <?php
 	// Now let's include the language file
 	include_once(getcwd(). '/lang/'. $_GET['lang']. '/lang.php');
-	
-	$audio_types = "mp3|ogg|wma|wav|aac|mp4|rm";
-	$video_types = "avi|wmv|mpeg|mov|mpg|rv";
+
+	$audio_types = "mp3|ogg|wma|wav|midi|mid|flac|aac|mp4|rm|mpc|m4a|wv|shn|ape|ofr| ";
+	$video_types = "avi|wmv|mpeg|mov|mpg|flv| ";
 ?>
 <div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"></div>
 <link rel="stylesheet" type="text/css" href="style.css">
@@ -44,23 +44,23 @@ function backData(){
 		echo '<div id="status"></div>';
 		function readAllDirs2($dirName, &$readCtr){
 			global $audio_types, $video_types, $word_files_analyzed;
-			
+
 			// Let's up the max_execution_time
 			ini_set('max_execution_time','6000');
-			// Let's look at the directory we are in		
+			// Let's look at the directory we are in
 			if (is_dir($dirName)){
 				$d = dir($dirName);
 				if (is_object($d)){
 					while($entry = $d->read()) {
 						// Let's make sure we are seeing real directories
 						if ($entry == "." || $entry == "..") { continue;}
-						if ($readCtr % 100 == 0){ 
+						if ($readCtr % 100 == 0){
 							?>
 							<script language="javascript">
-								p.innerHTML = '<b><?php echo $readCtr. " ". $word_files_analyzed; ?></b>';									
+								p.innerHTML = '<b><?php echo $readCtr. " ". $word_files_analyzed; ?></b>';
 								-->
 							</SCRIPT>
-							<?php 
+							<?php
 							@flush(); @ob_flush();
 						}
 						// Now let's see if we are looking at a directory or not
@@ -71,21 +71,21 @@ function backData(){
 							if (preg_match("/\.($audio_types|$video_types)$/i", $entry)){
 								$readCtr++;
 								$_SESSION['jz_full_counter']++;
-							}							
-						}			
+							}
+						}
 					}
 					// Now let's close the directory
 					$d->close();
 				}
-			}		
+			}
 		}
-		
+
 		// Ok, now let's figure out the
 		$dirName = $_POST['directory'];
 		$readCtr = 0; $_SESSION['jz_full_counter'] = 0;
 		?>
 		<script language="javascript">
-			p = document.getElementById("status");							
+			p = document.getElementById("status");
 			-->
 		</SCRIPT>
 		<?php
@@ -102,10 +102,10 @@ function backData(){
 		// Now let's import
 		?>
 		<script language="javascript">
-			p.innerHTML = '&nbsp;';									
+			p.innerHTML = '&nbsp;';
 			-->
 		</SCRIPT>
-		<?php 
+		<?php
 		@flush(); @ob_flush();
 		echo str_replace("YYYY",$takeTime,str_replace("XXXXX",$_SESSION['jz_full_counter'],$word_import_message1));
 		echo '<form name="browserForm"><input type="hidden" value="'. $_POST['directory']. '" name="directory"><input type="hidden" value="'. $_SESSION['jz_full_counter']. '" name="media_length"></form>';
@@ -131,13 +131,13 @@ function backData(){
 						$dirName = $_GET['dir'];
 						$os = "";
 						if (is_dir("c:/")){
-							$os = "win";							
+							$os = "win";
 						}
 					} else {
 						// Now let's see if we are on linux or Windows
 						$os = "";
 						if (is_dir("c:/")){
-							$os = "win";							
+							$os = "win";
 						}
 						if ($os !== "win"){
 							$dirName = "/";
@@ -147,7 +147,7 @@ function backData(){
 					}
 				?>
 					<nobr><?php echo $word_server_directory; ?><br>
-					<?php 
+					<?php
 						if ($os == "win"){
 							// Now let's let them select other drives
 							echo '<form name="browserForm" action="browse.php?lang='. $_GET['lang']. '&prefix='. $prefix. '" method="get">';
@@ -165,7 +165,7 @@ function backData(){
 						}
 					?>
 					<form name="browserForm" action="browse.php?lang=<?php echo $_GET['lang']. '&prefix='. $prefix; ?>" method="post">
-					<input type="text" value="<?php echo $dirName; ?>" name="directory" size="20"> 
+					<input type="text" value="<?php echo $dirName; ?>" name="directory" size="20">
 					<input type="submit" value="<?php echo $word_analyze; ?>" name="rData"></nobr>
 				</form>
 				<br><br>

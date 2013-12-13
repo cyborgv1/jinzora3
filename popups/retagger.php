@@ -215,7 +215,7 @@ if (isset ($_POST['updateTags'])) {
 			$meta['album'] = $album;
 		}
 		if ($reTrack && !isNothing($tNum)) {
-			$meta['number'] = $tNum;
+			$meta['track'] = $tNum;
 		}
 		if ($reNumber && !isNothing($tName)) {
 			$meta['title'] = $tName;

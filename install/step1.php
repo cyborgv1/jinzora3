@@ -13,90 +13,12 @@
 	<a href="http://www.jinzora.com" target="_blank"><img src="<?php echo $include_path; ?>install/logo.gif" border="0" align="right" vspace="5" hspace="0"></a>
 	<h1>Welcome to Jinzora <?php echo $version; ?>!</h1>
 	<p>
-	The Web Based Installer (WBI) will guide you through the process of installing Jinzora on your server. The WBI is <a href="http://en.jinzorahelp.com/wiki/Web_Based_Installer" target="_blank">documented</a> in our Wiki at Jinzorahelp.com.
+	The Web Based Installer (WBI) will guide you through the process of installing Jinzora on your server.
 	<br>
 	<?php
-		// Now let's check to see if the install has begun
-		if (is_file($include_path. "temp/install.lock")){
-			echo "<br><br><strong>Attention!</strong><br><br>This Jinzora installation has already been started by someone else.  ";
-			echo "You will not be able to access Jinzora until that installation is complete.  If you are seeing this message and are the ";
-			echo "administrator of this site you need to remove the file 'install.lock' in your the directory ". getcwd(). "/temp Jinzora temp directory before proceeding";
-			echo '</div>';
-			include_once($include_path. 'install/footer.php');
-			exit();
-		}
-	?>
-	<?php
-		// Let's reset our tracking session variables just in case the user restarts the install
+		// Lets reset our tracking session variables just in case the user restarts the install
 		unset($_SESSION['all_media_paths']);
-
-		// Now let's read the news from the Jinzora site IF we can
-		$contents = "";
-		$url = "http://wbi.jinzora.com/changelogs/3alpha1.html";
-		$url_parsed = parse_url($url);
-		$host = $url_parsed["host"];
-		$path = $url_parsed["path"];
-		$out = "GET $path HTTP/1.0\r\nHost: $host\r\n\r\n";
-		$fp = @fsockopen($host, 80, $errno, $errstr, 30);
-		if ($fp){
-			fwrite($fp, $out);
-			$body = false;
-			while (!feof($fp)) {
-			   $s = fgets($fp, 1024);
-			   if ( $body )
-				   $contents .= $s;
-			   if ( $s == "\r\n" )
-				   $body = true;
-			}
-			fclose($fp);
-						
-			// Now let's get the specific changelog for this build
-			$needle = "<!-- ". $version. " -->";
-			$needle2 = "<!-- /". $version. " -->";
-			$contents = substr($contents,strpos($contents,$needle));
-			$contents = substr($contents,0,strpos($contents,$needle2));
-
-			// Ok, now let's get the build number
-			$build="";
-			$url = "http://wbi.jinzora.com/current-build.txt";
-			$url_parsed = parse_url($url);
-			$host = $url_parsed["host"];
-			$path = $url_parsed["path"];
-			$out = "GET $path HTTP/1.0\r\nHost: $host\r\n\r\n";
-			$fp2 = @fsockopen($host, 80, $errno, $errstr, 10);
-			if ($fp2){
-				fwrite($fp2, $out);
-				$body = false;
-				while (!feof($fp2)) {
-				   $s = fgets($fp2, 1024);
-				   if ( $body )
-					   $build .= $s;
-				   if ( $s == "\r\n" )
-					   $body = true;
-				}
-			}
-			$build = trim($build);
-
-			// Now let's make sure they are using the current build
-			if ($version < $build){
-				echo "<br><strong>WARNING: You are not using the latest Jinzora Release!</strong><br><br>";
-				echo "You are using version <strong>". $version. "</strong>. The current Jinzora Release is <strong>". $build. "</strong>.<br><br>";
-				echo 'It is highly recommended to abort this installation and to <a href="http://www.jinzora.com/download/release">download</a> the latest version!<br>';
-			}
-			echo $contents;
-		} else {
-			echo "<br>Sorry, we couldn't contact www.jinzora.com for the latest news about Jinzora.  Please make sure you are".
-			   	 " installing the latest version of Jinzora by visiting <a href=http://www.jinzora.com>www.jinzora.com</a><br><br>";
-		}
 	?>
-	<br />
-
-	<div class="go">
-		<span class="goToNext">
-			Jinzora <?php echo $version; ?> Changelog - <a href="http://en.jinzora.com/development/changelog" target="_blank">SVN Changelog</a>
-		</span>
-	</div>
-	<iframe src="http://wbi.jinzora.com/changelogs/3alpha1.html" height="150px" width="510px" frameborder="0"></iframe>
 	<br><br>
 	<div class="go">
 		<span class="goToNext">

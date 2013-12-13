@@ -656,12 +656,8 @@
 				$pathArray = $this->getPath();
 				$level = $this->getLevel();
 				$pathString = jz_db_escape($this->getPath("String"));
-				if ($pathString == "") {
-				  $sql = "SELECT count(*) as nodecount, 0 as leafcount FROM jz_nodes WHERE level = 1";
-				} else {
-	                     	  $sql = "SELECT nodecount,leafcount FROM jz_nodes WHERE path LIKE '${pathString}'";
-	                     	}
-
+	                     	$sql = "SELECT nodecount,leafcount FROM jz_nodes WHERE path LIKE '${pathString}'";
+	                     	
 	                     	$results = jz_db_query($link,$sql);
 	                     	jz_db_close($link);
 
@@ -725,7 +721,7 @@
 		* @version 10/31/04
 		* @since 5/14/2004
 		*/
-		function getSubNodes($type="nodes", $distance=false, $random=false, $limit=0, $hasArt = false, $offset=false) {
+		function getSubNodes($type="nodes", $distance=false, $random=false, $limit=0, $hasArt = false) {
 			global $sql_type, $sql_pw, $sql_socket, $sql_db, $sql_usr,$backend,$default_importer;
 			
 			if ($distance === false) {
@@ -763,6 +759,7 @@
             	$artString = "";
             }
 			
+			
 			// now the query.
 			if ($type == "leaves") {
 				$sql = "SELECT * FROM jz_tracks WHERE level $op $level AND hidden = 'false' AND path LIKE '${pathString}%'";
@@ -776,9 +773,6 @@
 				}
 				if ($limit > 0) {
 					$sql .= " LIMIT $limit";
-				}
-				if ($offset !== false) {
-				   $sql .= " OFFSET $offset";
 				}
 				return jz_db_object_query($sql);
 			} else {
@@ -798,9 +792,6 @@
 				}
 				if ($limit > 0) {
 					$sql .= " LIMIT $limit";
-				}
-				if ($offset !== false) {
-				   $sql .= " OFFSET $offset";
 				}
 				return jz_db_object_query($sql);
 			}
@@ -1373,11 +1364,7 @@
 		function getPType() {
 			global $sql_type,$sql_pw,$sql_usr,$sql_socket,$sql_db;
 			
-			if ($this->getLevel() == 0) return "root";
-			if (isset($this->ptype)) {
-			  return $this->ptype;
-			}
-		
+			if ($this->getLevel() == 0) return "root";				
 			if (!$link = jz_db_connect())
                 		die ("could not connect to database.");
                 		
@@ -2399,18 +2386,12 @@ function filenameToPath($fp) {
 		* @version 5/14/04
 		* @since 5/14/04
 		*/
-		function getMainArt($dimensions = false, $createBlank = true, $imageType="audio", $cacheOnly=false) {
+		function getMainArt($dimensions = false, $createBlank = true, $imageType="audio") {
 		  global $sql_type,$sql_pw,$sql_usr,$sql_socket,$sql_db,$jzSERVICES;
 		  
 		  $path = jz_db_escape($this->getPath("String"));
-		  if (isset($this->artpath) && $this->artpath) {
-		     $results = array('main_art' => $this->artpath);
-		  } else if ($cacheOnly) {
-		    return false;
-		  } else {
-		     $results = jz_db_simple_query("SELECT main_art FROM jz_nodes WHERE path = '$path'");
-		  }
-
+		  $results = jz_db_simple_query("SELECT main_art FROM jz_nodes WHERE path = '$path'");
+		  
 		  if ($results['main_art']) {
 		    // Now let's make create the resized art IF needed
 		    $this->artpath = jz_db_unescape($results['main_art']);
@@ -2424,13 +2405,14 @@ function filenameToPath($fp) {
 		      if ($meta['pic_name'] <> ""){
 			if ($dimensions){
 			  // Now lets check or create or image and return the resized one
-			  return $jzSERVICES->resizeImage("ID3:". $tracks[0]->getDataPath(), $dimensions, false, $imageType);
+			  return $jzSERVICES->resizeImage("ID3:". $tracks[0]->getDataPath(), $dimensions, $imageType);
 			} else {
 			  return "ID3:". $tracks[0]->getDataPath();
 			}
 		      }
 		    }
 		  }
+		  // inheritance is sweet.
 		  return parent::getMainArt($dimensions,$createBlank, $imageType);
 		}
 		
@@ -2962,7 +2944,6 @@ function filenameToPath($fp) {
 				$results = jz_db_query($link, "SELECT jz_tracks.*,jz_nodes.name,jz_nodes.descr FROM jz_tracks,jz_nodes 
 				WHERE jz_nodes.path = '$path' AND jz_nodes.path = jz_tracks.path");
 				
-				// Also see "backends/db-common.php" for an in-place meta retrieval.
 				$meta['title'] = jz_db_unescape($results->data[0]['trackname']);
 				$meta['bitrate'] = jz_db_unescape($results->data[0]['bitrate']);
 				$meta['frequency'] = jz_db_unescape($results->data[0]['frequency']);
@@ -3409,17 +3390,11 @@ function filenameToPath($fp) {
 		* @version 5/14/04
 		* @since 5/14/04
 		*/
-		function getMainArt($dimensions = false, $createBlank = true, $imageType="audio", $cacheOnly = false) {
+		function getMainArt($dimensions = false, $createBlank = true, $imageType="audio") {
 		  global $sql_type,$sql_pw,$sql_usr,$sql_socket,$sql_db,$jzSERVICES;
 		  
 		  $path = jz_db_escape($this->getPath("String"));
-		  if ($this->artpath) {
-		     $results = array('main_art' => $this->artpath);
-		  } else if ($cacheOnly) {
-		    return false;
-		  } else {
-		     $results = jz_db_simple_query("SELECT main_art FROM jz_nodes WHERE path = '$path'");
-		  }
+		  $results = jz_db_simple_query("SELECT main_art FROM jz_nodes WHERE path = '$path'");
 		  
 		  if ($results['main_art']) {
 		    // Now let's make create the resized art IF needed
