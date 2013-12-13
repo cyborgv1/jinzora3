@@ -1,0 +1,25 @@
+Modified ./install/defaultsettings.php fixing problem where ofr, flv, jpeg, and wmv file types are not scanned during install.
+fixed random play amounts, default_art, resampleRates, always_resample, and jb_volumes default options. These needed a vertical bar after the last option otherwise the last option is not available or ignored.
+Modified ./install/defaultsettings.php to default to the flvplayer as the embedded player, and set title truncate settings to 45.
+Modified ./install/browse.php to include all file types supported in defaultsettings.php
+Modified ./install/step7.php to include all file types supported in defaultsettings.php
+
+created blank settings.php.
+changed all directory permissions to read, and execute for owner and group, no permission for other.
+changed all file permissions to read for both owner and group. no permission for others.
+set read, write, execute recursively on data directory and temp directories for owner and group.
+set read and write permissions on settings.php for owner and group.
+set read, write, and exectute recursively on install directory for owner and group.
+
+added a new flash based player, flvplayer, flvplayer.php and flvplayer.swf to services/services/players
+replaced version 3.20 of ufo.js with version 3.22. Modified a visibility variable in ufo.js
+
+modified ./frontend/display.php to add expirimental quality options to streaming. This seems to do nothing for now.
+modified ./frontend/frontends/slick/blocks.php to add expirimental quality control options. This seems to do nothing for now.
+
+modified ./install/step1.php to remove all references to the now defunct jinzora website.
+modified ./install/step9.php to remove all links to defunct jinzora website. Need to remove the option to share stats as well.
+
+copied ./install/thumbs from jinzora 2.8 to fix corrupt thumbnails.
+
+replace configure.sh with permissions.sh will correct all permissions in directory.
